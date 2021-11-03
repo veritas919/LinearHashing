@@ -32,3 +32,7 @@ print(num_as_bin)
 
 bigger_last_bits = num_as_bin[-1: -(2 + 2) : -1]
 print(bigger_last_bits[::-1]) 
+
+res = 10/2
+print(res)
+print(type(res))
