@@ -68,8 +68,8 @@ class LinearHashing:
             
             if len(num_as_bin) <= self.level:
                 ht_index_try_1 = num
-                if ht_index_try_one in self.hash_table:
-                    self.hash_table[ht_index_try_one].append(num)
+                if ht_index_try_1 in self.hash_table:
+                    self.hash_table[ht_index_try_1].append(num)
                 else:
                     print("cant find matching bucket")
 
@@ -288,6 +288,8 @@ class LinearHashing:
 if __name__ == "__main__":
     x = LinearHashing(page_size = 2, policy = 0, max_overflow = 2)
     x.insert(2)
+    x.insert(0)
+    x.insert(1) 
     print("bucket #: ", x.get_num_buckets())
     x.insert(5)
     print("bucket #: ", x.get_num_buckets())
@@ -301,6 +303,8 @@ if __name__ == "__main__":
     print("bucket #: ", x.get_num_buckets())
     x.print_ht()
     x.insert(999)
+    x.insert(-13)
+    x.insert(-55)
 
     # x.print_ht() 
     x.insert(43) 
@@ -308,6 +312,11 @@ if __name__ == "__main__":
     x.print_ht() 
     
     x.insert(8) 
+    x.insert(21)
+    x.insert(32)
+    x.insert(2000)
+    x.insert(0)
+    x.insert(1) 
 
 
     x.print_ht()
