@@ -22,3 +22,13 @@ print(x[3:3])
 
 print(math.ceil(1))
 print(math.ceil(1.0001))
+
+name = "Olivia"
+print(name[-1: -3: -1])
+
+num = 43
+num_as_bin = bin(num)[2:]
+print(num_as_bin)
+
+bigger_last_bits = num_as_bin[-1: -(2 + 2) : -1]
+print(bigger_last_bits[::-1]) 

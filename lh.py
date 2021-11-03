@@ -62,31 +62,36 @@ class LinearHashing:
         else: 
             print("else", num)
             print("Level is: ", self.level)
-            # insert # into proper bucket 
+            
+            ############ INSERT NUMBER INTO BUCKET ############
             num_as_bin = bin(num)[2:]
-            start = len(num_as_bin) - self.level
-            last_k_bits = num_as_bin[start : len(num_as_bin)]
-            ht_index_try_1 = int(last_k_bits, 2)
-            print(ht_index_try_1)
-            # check if that index is in ht 
-            if ht_index_try_1 in self.hash_table:
-                self.hash_table[ht_index_try_1].append(num)
-
-            else:
-                last_k_plus1_bits = num_as_bin[start-1: len(num_as_bin)]
-                ht_index_try_2 = int(last_k_plus1_bits, 2)
-                if ht_index_try_2 in self.hash_table:
-                    self.hash_table[ht_index_try_2].append(num) 
+            
+            if len(num_as_bin) <= self.level:
+                ht_index_try_1 = num
+                if ht_index_try_one in self.hash_table:
+                    self.hash_table[ht_index_try_one].append(num)
                 else:
-                    print("cant find bucket to add # to...", last_k_bits, last_k_plus1_bits, self.level)
+                    print("cant find matching bucket")
+
+            # number as binary is necessarily >= 2 
+            else: 
+                bigger_last_bits = num_as_bin[-1: -(self.level + 2) : -1][::-1]
+                smaller_last_bits = num_as_bin[-1: -(self.level + 1) : -1][::-1]
+                if int(bigger_last_bits, 2) in self.hash_table:
+                    self.hash_table[int(bigger_last_bits,2)].append(num) 
+                elif int(smaller_last_bits, 2) in self.hash_table:
+                    self.hash_table[int(smaller_last_bits,2)].append(num) 
+                else:
+                    print("problem. number is....:", num, bigger_last_bits, smaller_last_bits)
 
             self.isOverflowedRightNow()
-            #if num==10:
-                #self.print_ht() 
+
             print("is overflow?", self.is_an_overflow_rn)
             # if there is an overflow  ----- > create new bucket, rehash, move ptr. Check if leveling up, and if so, reset ptr
             if self.is_an_overflow_rn == True:
+                # print("spliiting bucket: ", )
                 bin_of_ptr =  bin(self.ptr)[2:]
+                print("spliting bucket: ", self.ptr)
                 new_bucket_value_0 = self.ptr
                 new_bucket_value_1 = self.ptr + 2**(self.level)
 
@@ -98,19 +103,29 @@ class LinearHashing:
                 bucket_0 = []
                 bucket_1 = []
                 for item in copy_of_bucket_being_split:
+                    print("item in splitting bucket...",item)
                     item_as_bin = bin(item)[2:]
-                    start = len(item_as_bin) - self.level - 1
-                    last_k_bits = item_as_bin[start : len(item_as_bin)]
-                    k_bits_as_int = int(last_k_bits, 2)
-                    # print(type(last_k_bits))
+
+                    if len(item_as_bin) <= self.level + 1:
+                        k_bits_as_int = item 
+                    else:
+                        k_bits_as_int = int(item_as_bin[-1: -(self.level + 2) : -1][::-1], 2)
+                        #start = len(item_as_bin) - self.level - 1
+                        #last_k_bits = item_as_bin[start : len(item_as_bin)]
+                        #print("last k bits and level: ", len(last_k_bits), self.level)
+                        #k_bits_as_int = int(last_k_bits, 2)
+                        #if item == 10:
+                            # print("10 here...k bits as int", k_bits_as_int, last_k_bits)
+                        # print(type(last_k_bits))
                     
                     if k_bits_as_int == new_bucket_value_0:
                         bucket_0.append(item)
                     elif k_bits_as_int == new_bucket_value_1:
                         bucket_1.append(item)
                     else:
-                        print("no bucket match after split", k_bits_as_int, new_bucket_value_0, new_bucket_value_1, self.level, self.ptr)
-                        print("info: ", item_as_bin, item, start)
+                        print("problemo. item val is: ", item) 
+                        #print("no bucket match after split", k_bits_as_int, new_bucket_value_0, new_bucket_value_1, self.level, self.ptr)
+                        # print("info: ", item_as_bin, item, start)
                     '''
                     if last_k_bits == new_bucket_0:
                         bucket_0.append(item)
@@ -284,6 +299,7 @@ if __name__ == "__main__":
     print("bucket #: ", x.get_num_buckets())
     x.insert(10)
     print("bucket #: ", x.get_num_buckets())
+    x.print_ht()
     x.insert(999)
 
     # x.print_ht() 
