@@ -35,9 +35,9 @@ class LinearHashing:
             # Insert number 
             self.hash_table[0].append(num) # add number 
             # check if any bucket is overflowing 
-            self.isOverflowedRightNow() 
+            #self.isOverflowedRightNow(0) 
                 # if there is an overflow  ----- > create new bucket, rehash, level up, reset ptr 
-            if self.is_an_overflow_rn == True:  
+            if self.isOverflowedRightNow(0) == True:  
                 self.hash_table[1] = [] # create new bucket 
 
                 copy_of_bucket_0 = copy.deepcopy(self.hash_table[0])
@@ -66,10 +66,12 @@ class LinearHashing:
             ############ INSERT NUMBER INTO BUCKET ############
             num_as_bin = bin(num)[2:]
             
+            bucket_key = None 
             if len(num_as_bin) <= self.level:
                 ht_index_try_1 = num
                 if ht_index_try_1 in self.hash_table:
                     self.hash_table[ht_index_try_1].append(num)
+                    bucket_key = ht_index_try_1
                 else:
                     print("cant find matching bucket")
 
@@ -78,17 +80,19 @@ class LinearHashing:
                 bigger_last_bits = num_as_bin[-1: -(self.level + 2) : -1][::-1]
                 smaller_last_bits = num_as_bin[-1: -(self.level + 1) : -1][::-1]
                 if int(bigger_last_bits, 2) in self.hash_table:
-                    self.hash_table[int(bigger_last_bits,2)].append(num) 
+                    self.hash_table[int(bigger_last_bits,2)].append(num)
+                    bucket_key = int(bigger_last_bits,2)
                 elif int(smaller_last_bits, 2) in self.hash_table:
                     self.hash_table[int(smaller_last_bits,2)].append(num) 
+                    bucket_key = int(smaller_last_bits,2)
                 else:
                     print("problem. number is....:", num, bigger_last_bits, smaller_last_bits)
 
-            self.isOverflowedRightNow()
+            # self.isOverflowedRightNow()
 
-            print("is overflow?", self.is_an_overflow_rn)
+            # print("is overflow?", self.is_an_overflow_rn)
             # if there is an overflow  ----- > create new bucket, rehash, move ptr. Check if leveling up, and if so, reset ptr
-            if self.is_an_overflow_rn == True:
+            if self.isOverflowedRightNow(bucket_key) == True:
                 # print("spliiting bucket: ", )
                 bin_of_ptr =  bin(self.ptr)[2:]
                 print("spliting bucket: ", self.ptr)
@@ -244,7 +248,16 @@ class LinearHashing:
     def get_num_buckets(self):
         return self.num_buckets 
 
-    def isOverflowedRightNow(self):
+    def isOverflowedRightNow(self, bucket_key):
+        if bucket_key not in self.hash_table:
+            print("error...key not in table. can't check for overflow")
+        else:
+            if len(self.hash_table[bucket_key]) > self.page_size: #overrflow!)
+                return True 
+            else:
+                return False 
+            
+        '''
         flag = False 
         for key in self.hash_table:
                 if len(self.hash_table[key]) > self.page_size: #overrflow!
@@ -254,6 +267,8 @@ class LinearHashing:
             self.is_an_overflow_rn = True
         else:
             self.is_an_overflow_rn = False 
+
+        '''
 
     def get_total_number_of_overflow_buckets(self):
         num_overflow = 0
@@ -278,8 +293,8 @@ class LinearHashing:
             print("\n")
 
 if __name__ == "__main__":
-    # x = LinearHashing(page_size = 2, policy = 0, max_overflow = 2)
-    x = LinearHashing(page_size = 2, policy = 1, max_overflow = 1) # should function same as default case 
+    x = LinearHashing(page_size = 2, policy = 0, max_overflow = 2)
+    # x = LinearHashing(page_size = 2, policy = 1, max_overflow = 1) # should function same as default case 
     x.insert(2)
     x.insert(0)
     x.insert(1) 
