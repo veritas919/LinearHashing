@@ -6,6 +6,20 @@ class LinearHashing:
 
     # constructor
     def __init__(self, page_size=None, policy = 0, max_overflow = 0, size_limit = 1.0):
+        
+
+        # basic error checking 
+        if page_size < 0 or None:
+            print("invalid page size. exitting.")
+            quit()
+
+        if policy not in range(0,4):
+            print("invalid policy number. exitting.")
+            quit() 
+        if size_limit < 0 or size_limit > 1:
+            print("size_limit should be in [0,1]")    
+            quit()    
+        
         self.page_size = page_size
         self.policy = policy
         self.level = 0
@@ -460,6 +474,55 @@ class LinearHashing:
  
         return split_occured 
 
+
+    ############################################################## Print to console method #######################################################
+    # note: I print -- in between pages / overflow buckets 
+    def Print(self):        
+        for key in self.hash_table:
+            key_binary = bin(key)[2:]
+            print("key", key, end = " binary ")
+            if (key + (2**(self.level)) in self.hash_table):
+                keyStr = key_binary.zfill(self.level + 1)
+            else:
+                keyStr = key_binary.zfill(self.level)
+            print(keyStr, end = " : ")
+
+            count = 0
+            for i, item in enumerate(self.hash_table[key]):
+                print(item, end = " ") 
+                count += 1
+                if count == self.page_size and i != len(self.hash_table[key]) - 1:
+                    print(" --  ", end = "")
+                    count = 0
+            print("\n")
+        print("Level", self.level)
+        print("Ptr", self.ptr)
+
+    #################################################### Print to file object ##########################
+    # note: I print -- in between pages / overflow buckets
+    def PrintFile(self, fileObj):        
+        with open(fileObj, 'w') as f:
+            for key in self.hash_table:
+                key_binary = bin(key)[2:]
+                print("key", key, end = " binary ", file = f)
+                if (key + (2**(self.level)) in self.hash_table):
+                    keyStr = key_binary.zfill(self.level + 1)
+                else:
+                    keyStr = key_binary.zfill(self.level)
+                print(keyStr, end = " : ", file = f)
+
+                count = 0
+                for i, item in enumerate(self.hash_table[key]):
+                    print(item, end = " ", file = f) 
+                    count += 1
+                    if count == self.page_size and i != len(self.hash_table[key]) - 1:
+                        print(" --  ", end = "", file = f)
+                        count = 0
+                print("\n", file = f)
+            
+            print("Level", self.level, file = f)
+            print("Ptr", self.ptr, file = f)
+
     # use for Case 2 
     def get_current_capacity_ratio(self):
         # get number of items in the table
@@ -523,9 +586,9 @@ class LinearHashing:
 
     def print_ht(self):
         for key in self.hash_table:
-            print("key", key)
+            print("key", key, end = " : ")
             for item in self.hash_table[key]:
-                print(item) 
+                print(item, end = " ") 
             print("\n")
 
 if __name__ == "__main__":
@@ -569,5 +632,8 @@ if __name__ == "__main__":
 
 
     x.print_ht()
+    print(" about to print in binary.........")
+    x.Print() 
+    x.PrintFile("output2.txt")
 
 

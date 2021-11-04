@@ -36,3 +36,10 @@ print(bigger_last_bits[::-1])
 res = 10/2
 print(res)
 print(type(res))
+
+num = 0
+as_bin = bin(num)[2:]
+print(type(as_bin))
+print(as_bin) 
+
+print(int(as_bin,2))
