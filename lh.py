@@ -12,6 +12,7 @@ class LinearHashingStats:
         self.overflow_buckets = 0
         self.access = 0
         self.access_insert_only = 0
+        self.split_count = 0 
 
     # return # of items in hash table
     def Count(self, hash_table):
@@ -28,6 +29,35 @@ class LinearHashingStats:
         for key in hash_table:
             num_keys += 1
         return num_keys 
+
+    # returns # of pages in table. If bucket has no numbers in it, it still has 1 page 
+    def Pages(self, hash_table, page_size):
+        # get number of pages in table
+        page_number = 0
+        for key in hash_table:
+            num_items_for_key = len(hash_table[key])
+            if num_items_for_key == 0: 
+                page_number += 1
+            else:
+                page_number += int(math.ceil(num_items_for_key / page_size)) 
+        return page_number 
+
+    def OverflowBuckets(self, hash_table, page_size):
+        num_overflow = 0
+        for key in hash_table:
+            num_items_for_key = len(hash_table[key])
+            if num_items_for_key == 0:
+                continue
+            overflow_for_that_key = int(math.ceil(num_items_for_key / page_size)) - 1
+            num_overflow += overflow_for_that_key 
+
+        # print("num overflow: ", num_overflow)
+        return num_overflow 
+
+    def SplitCount(self):
+        return self.split_count 
+
+
 
 
 class LinearHashing:
@@ -107,7 +137,8 @@ class LinearHashing:
                 self.level = 1
                 self.ptr = 0 
                 self.num_buckets += 1
-                split_occured = True 
+                split_occured = True
+                self.stats += 1 # update stats object  
 
                 # self.isOverflowedRightNow()   # MUST RECHECK    WORKS FINE WITHOUT @@@@@@@@@@@@ TAKE OUT TEMP 
 
@@ -179,6 +210,7 @@ class LinearHashing:
                 self.num_buckets += 1
                 self.ptr +=1 
                 split_occured = True 
+                self.stats.split_count += 1
                 # post split, check if next level now
                 if self.num_buckets == 2**(self.level+1):
                     print("incrementing level")
@@ -220,7 +252,8 @@ class LinearHashing:
                 self.level = 1
                 self.ptr = 0 
                 self.num_buckets += 1 # dont know abt this 
-                split_occured = True 
+                split_occured = True
+                self.stats.split_count += 1 
 
         # for other levels
         else: 
@@ -285,7 +318,8 @@ class LinearHashing:
                 
                 self.num_buckets += 1
                 self.ptr +=1 
-                split_occured = True 
+                split_occured = True
+                self.stats.split_count += 1  
                 # post split, check if next level now
                 if self.num_buckets == 2**(self.level+1):
                     print("incrementing level")
@@ -326,7 +360,8 @@ class LinearHashing:
                 self.level = 1
                 self.ptr = 0 
                 self.num_buckets += 1 # dont know abt this 
-                split_occured = True 
+                split_occured = True
+                self.stats.split_count += 1  
 
         # for other levels
         else: 
@@ -388,7 +423,8 @@ class LinearHashing:
                 
                 self.num_buckets += 1
                 self.ptr +=1 
-                split_occured = True 
+                split_occured = True
+                self.stats.split_count += 1  
                 # post split, check if next level now
                 if self.num_buckets == 2**(self.level+1):
                     print("incrementing level")
@@ -427,7 +463,8 @@ class LinearHashing:
                 self.level = 1
                 self.ptr = 0 
                 self.num_buckets += 1
-                split_occured = True 
+                split_occured = True
+                self.stats.split_count += 1  
 
                 # self.isOverflowedRightNow()   # MUST RECHECK    WORKS FINE WITHOUT @@@@@@@@@@@@ TAKE OUT TEMP 
 
@@ -496,6 +533,7 @@ class LinearHashing:
                 self.num_buckets += 1
                 self.ptr +=1 
                 split_occured = True 
+                self.stats.split_count += 1 
                 # post split, check if next level now
                 if self.num_buckets == 2**(self.level+1):
                     print("incrementing level")
@@ -769,6 +807,9 @@ if __name__ == "__main__":
     x.Insert(2000)
     x.Insert(0)
     x.Insert(1) 
+    x.Insert(55)
+    x.Insert(-55) 
+
 
 
     x.print_ht()
@@ -789,5 +830,8 @@ if __name__ == "__main__":
     print("STATS")
     print(x.stats.Count(x.hash_table)) 
     print(x.stats.Buckets(x.hash_table))
+    print(x.stats.Pages(x.hash_table, x.page_size))
+    print(x.stats.OverflowBuckets(x.hash_table, x.page_size))
+    print(x.stats.SplitCount())
 
 

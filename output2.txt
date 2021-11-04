@@ -12,7 +12,7 @@ key 5 binary 101 : 5 -13  --  45 21
 
 key 6 binary 110 : 
 
-key 7 binary 111 : 23 55  --  999 -55 
+key 7 binary 111 : 23 55  --  999 -55  --  55 -55 
 
 key 8 binary 1000 : 8 
 
