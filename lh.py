@@ -2,6 +2,70 @@
 import copy 
 import math 
 
+
+class LinearHashingStats:
+
+    def __init__(self):
+        self.count = 0
+        self.buckets = 0
+        self.pages = 0
+        self.overflow_buckets = 0
+        self.access = 0
+        self.access_insert_only = 0
+        self.split_count = 0 
+
+    # return # of items in hash table
+    def Count(self, hash_table):
+        # get number of items in the table
+        num_items_in_table = 0
+        for key in hash_table:
+            num_items_for_key = len(hash_table[key])
+            num_items_in_table += num_items_for_key 
+        return num_items_in_table
+
+    # return # of main buckets ... NOT counting overflow. doesnt matter if bucket is empty or not....it counts  
+    def Buckets(self, hash_table):
+        num_keys = 0
+        for key in hash_table:
+            num_keys += 1
+        return num_keys 
+
+    # returns # of pages in table. If bucket has no numbers in it, it still has 1 page 
+    def Pages(self, hash_table, page_size):
+        # get number of pages in table
+        page_number = 0
+        for key in hash_table:
+            num_items_for_key = len(hash_table[key])
+            if num_items_for_key == 0: 
+                page_number += 1
+            else:
+                page_number += int(math.ceil(num_items_for_key / page_size)) 
+        return page_number 
+
+    def OverflowBuckets(self, hash_table, page_size):
+        num_overflow = 0
+        for key in hash_table:
+            num_items_for_key = len(hash_table[key])
+            if num_items_for_key == 0:
+                continue
+            overflow_for_that_key = int(math.ceil(num_items_for_key / page_size)) - 1
+            num_overflow += overflow_for_that_key 
+
+        # print("num overflow: ", num_overflow)
+        return num_overflow 
+
+    def SplitCount(self):
+        return self.split_count 
+
+    def Access(self):
+        return self.access 
+
+    def AccessInsertOnly(self):
+        return self.access_insert_only
+
+
+
+
 class LinearHashing:
 
     # constructor
@@ -24,26 +88,38 @@ class LinearHashing:
         self.policy = policy
         self.level = 0
         self.ptr = 0
-        self.is_an_overflow_rn = False
-        self.num_buckets_overflowing = 0
-        self.num_buckets = 1 # only keeping track of main buckets rn....NOT overflow 
         self.max_overflow = max_overflow 
         self.size_limit = size_limit 
+
+        self.stats = LinearHashingStats() 
+
+        self.is_an_overflow_rn = False  # dont think I need 
+        self.num_buckets_overflowing = 0    # dont think I need 
+        self.num_buckets = 1 # only keeping track of main buckets rn....NOT overflow. dont think I use this  
 
         print("SIZELIMIT", self.size_limit)
 
         self.hash_table = {}
         self.hash_table [0] = []
 
-    def insert(self, number):
+    def Insert(self, number):
+        # call appropriate insert function. Also increment access by one 
         if self.policy == 0:
             self.case_0_insert(number)
+            self.stats.access += 1
+            self.stats.access_insert_only += 1 
         elif self.policy == 1:
-            self.case_1_insert(number) 
+            self.case_1_insert(number)
+            self.stats.access += 1 
+            self.stats.access_insert_only += 1 
         elif self.policy == 2:
-            self.case_2_insert(number) 
+            self.case_2_insert(number)
+            self.stats.access += 1 
+            self.stats.access_insert_only += 1 
         elif self.policy == 3:
             self.case_3_insert(number)
+            self.stats.access += 1
+            self.stats.access_insert_only += 1 
         else:
             print("invalid value for policy.")
 
@@ -76,7 +152,8 @@ class LinearHashing:
                 self.level = 1
                 self.ptr = 0 
                 self.num_buckets += 1
-                split_occured = True 
+                split_occured = True
+                self.stats += 1 # update stats object  
 
                 # self.isOverflowedRightNow()   # MUST RECHECK    WORKS FINE WITHOUT @@@@@@@@@@@@ TAKE OUT TEMP 
 
@@ -148,6 +225,7 @@ class LinearHashing:
                 self.num_buckets += 1
                 self.ptr +=1 
                 split_occured = True 
+                self.stats.split_count += 1
                 # post split, check if next level now
                 if self.num_buckets == 2**(self.level+1):
                     print("incrementing level")
@@ -189,7 +267,8 @@ class LinearHashing:
                 self.level = 1
                 self.ptr = 0 
                 self.num_buckets += 1 # dont know abt this 
-                split_occured = True 
+                split_occured = True
+                self.stats.split_count += 1 
 
         # for other levels
         else: 
@@ -254,7 +333,8 @@ class LinearHashing:
                 
                 self.num_buckets += 1
                 self.ptr +=1 
-                split_occured = True 
+                split_occured = True
+                self.stats.split_count += 1  
                 # post split, check if next level now
                 if self.num_buckets == 2**(self.level+1):
                     print("incrementing level")
@@ -295,7 +375,8 @@ class LinearHashing:
                 self.level = 1
                 self.ptr = 0 
                 self.num_buckets += 1 # dont know abt this 
-                split_occured = True 
+                split_occured = True
+                self.stats.split_count += 1  
 
         # for other levels
         else: 
@@ -357,7 +438,8 @@ class LinearHashing:
                 
                 self.num_buckets += 1
                 self.ptr +=1 
-                split_occured = True 
+                split_occured = True
+                self.stats.split_count += 1  
                 # post split, check if next level now
                 if self.num_buckets == 2**(self.level+1):
                     print("incrementing level")
@@ -396,7 +478,8 @@ class LinearHashing:
                 self.level = 1
                 self.ptr = 0 
                 self.num_buckets += 1
-                split_occured = True 
+                split_occured = True
+                self.stats.split_count += 1  
 
                 # self.isOverflowedRightNow()   # MUST RECHECK    WORKS FINE WITHOUT @@@@@@@@@@@@ TAKE OUT TEMP 
 
@@ -465,6 +548,7 @@ class LinearHashing:
                 self.num_buckets += 1
                 self.ptr +=1 
                 split_occured = True 
+                self.stats.split_count += 1 
                 # post split, check if next level now
                 if self.num_buckets == 2**(self.level+1):
                     print("incrementing level")
@@ -474,6 +558,86 @@ class LinearHashing:
  
         return split_occured 
 
+
+    ############################################################## Search #################################################################
+    def Search(self, num_to_find):
+        num_as_bin = bin(num_to_find)[2:]
+        pages_accessed = 0
+
+        # 1 bucket only. Level 0 
+        if self.level == 0:
+            # if the bucket is empty return 0
+            if len(self.hash_table[0]) == 0:
+                return 0
+            else:
+                for i, item in enumerate(self.hash_table[0]):
+                    if item == num_to_find:
+                        pages_accessed = int(math.ceil((i + 1) / self.page_size))
+                        self.stats.access += pages_accessed 
+                        return pages_accessed
+                # number not found in bucket 
+                self.stats.access += int(math.ceil(len(self.hash_table[0]) / self.page_size))
+                return -1 * int(math.ceil(len(self.hash_table[0]) / self.page_size))
+        
+        # level >= 1         
+        else:
+            # bucket_key = None 
+            if len(num_as_bin) <= self.level:
+                ht_index_try_1 = num_to_find
+                if ht_index_try_1 in self.hash_table:
+                    # if the bucket to be searched is empty, return 0 
+                    if len(self.hash_table[ht_index_try_1]) == 0:
+                        return 0
+                    else:
+                        for i, item in enumerate(self.hash_table[ht_index_try_1]):
+                            if item == num_to_find:
+                                pages_accessed = int(math.ceil((i + 1) / self.page_size))
+                                self.stats.access += pages_accessed  
+                                return pages_accessed
+
+                        # number not found in bucket
+                        self.stats.access += int(math.ceil(len(self.hash_table[ht_index_try_1]) / self.page_size))
+                        return -1 * int(math.ceil(len(self.hash_table[ht_index_try_1]) / self.page_size))
+                    
+                else:
+                    print("in search. cant find matching bucket key")
+
+            # number as binary is necessarily >= 2 
+            else: 
+                bigger_last_bits = num_as_bin[-1: -(self.level + 2) : -1][::-1]
+                smaller_last_bits = num_as_bin[-1: -(self.level + 1) : -1][::-1]
+                if int(bigger_last_bits, 2) in self.hash_table:
+                    # if the bucket to be searched is empty, return 0 
+                    if len(self.hash_table[int(bigger_last_bits, 2)]) == 0:
+                        return 0
+                    else:
+                        for i, item in enumerate(self.hash_table[int(bigger_last_bits, 2)]):
+                            if item == num_to_find:
+                                pages_accessed = int(math.ceil((i + 1) / self.page_size))
+                                self.stats.access += pages_accessed  
+                                return pages_accessed
+
+                        # number not found in bucket
+                        self.stats.access += int(math.ceil(len(self.hash_table[int(bigger_last_bits, 2)]) / self.page_size))
+                        return -1 * int(math.ceil(len(self.hash_table[int(bigger_last_bits, 2)]) / self.page_size))
+                elif int(smaller_last_bits, 2) in self.hash_table:
+                    # if the bucket to be searched is empty, return 0 
+                    if len(self.hash_table[int(smaller_last_bits, 2)]) == 0:
+                        return 0
+                    else:
+                        for i, item in enumerate(self.hash_table[int(smaller_last_bits, 2)]):
+                            if item == num_to_find:
+                                pages_accessed = int(math.ceil((i + 1) / self.page_size))
+                                self.stats.access += pages_accessed  
+                                return pages_accessed
+
+                        # number not found in bucket
+                        self.stats.access += int(math.ceil(len(self.hash_table[int(smaller_last_bits, 2)]) / self.page_size))
+                        return -1 * int(math.ceil(len(self.hash_table[int(smaller_last_bits, 2)]) / self.page_size))
+                    
+                else:
+                    print("problem. number is....:", num_to_find, bigger_last_bits, smaller_last_bits)
+        
 
     ############################################################## Print to console method #######################################################
     # note: I print -- in between pages / overflow buckets 
@@ -522,6 +686,32 @@ class LinearHashing:
             
             print("Level", self.level, file = f)
             print("Ptr", self.ptr, file = f)
+
+    ####################################################################### Count ####################################################
+    # returns number of items in hash table 
+    def Count(self):
+        # get number of items in the table
+        num_items_in_table = 0
+        for key in self.hash_table:
+            num_items_for_key = len(self.hash_table[key])
+            num_items_in_table += num_items_for_key
+        return num_items_in_table
+
+    ####################################################################### ListBucket ##################################################
+    # takes an integer representing the key. for ex. 7
+    # returns all numbers in the bucket for that key 
+    def ListBucket(self, bucket_key):
+        if bucket_key in self.hash_table:
+            results = self.hash_table[bucket_key]
+            return results
+        else:
+            print("problem in ListBucket...bucket_key passed in as param not a key in hash table")
+
+    ###################################################################### GetStats #################################################
+    def GetStats(self):
+        return self.stats 
+
+
 
     # use for Case 2 
     def get_current_capacity_ratio(self):
@@ -591,49 +781,89 @@ class LinearHashing:
                 print(item, end = " ") 
             print("\n")
 
+
 if __name__ == "__main__":
     # x = LinearHashing(page_size = 2, policy = 0, max_overflow = 2)
     # x = LinearHashing(page_size = 2, policy = 1, max_overflow = 0) # should function same as default case 
     # x = LinearHashing(page_size = 2, policy = 2, size_limit = 0.7)
+    
+    '''
+    x = LinearHashing(page_size = 1, policy = 2, size_limit = 0.7)
+
+    x.insert(23)
+    x.insert(22)
+    x.insert(47)
+    x.Print() 
+    print(x.Search(23))
+    print(x.Search(1))
+    print(x.Search(47))
+    print(x.Search(222222))
+    
+    '''
     x = LinearHashing(page_size = 2, policy = 3)
 
-    x.insert(2)
-    x.insert(0)
-    x.insert(1) 
+    x.Insert(2)
+    x.Insert(0)
+    x.Insert(1) 
     print("bucket #: ", x.get_num_buckets())
-    x.insert(5)
+    x.Insert(5)
     print("bucket #: ", x.get_num_buckets())
-    x.insert(23)
+    x.Insert(23)
     print("bucket #: ", x.get_num_buckets())
-    x.insert(42)
+    x.Insert(42)
     print("bucket #: ", x.get_num_buckets())
-    x.insert(55)
+    x.Insert(55)
     print("bucket #: ", x.get_num_buckets())
-    x.insert(10)
+    x.Insert(10)
     print("bucket #: ", x.get_num_buckets())
     x.print_ht()
-    x.insert(999)
-    x.insert(-13)
-    x.insert(-55)
+    x.Insert(999)
+    x.Insert(-13)
+    x.Insert(-55)
 
     # x.print_ht() 
-    x.insert(43) 
+    x.Insert(43) 
 
     x.print_ht() 
     
-    x.insert(45)
-    x.insert(2328356)
-    x.insert(8) 
-    x.insert(21)
-    x.insert(32)
-    x.insert(2000)
-    x.insert(0)
-    x.insert(1) 
+    x.Insert(45)
+    x.Insert(2328356)
+    x.Insert(8) 
+    x.Insert(21)
+    x.Insert(32)
+    x.Insert(2000)
+    x.Insert(0)
+    x.Insert(1) 
+    x.Insert(55)
+    x.Insert(-55) 
+
 
 
     x.print_ht()
     print(" about to print in binary.........")
     x.Print() 
     x.PrintFile("output2.txt")
+    print(x.Count())
+    arr = x.ListBucket(5)
+    print(arr) 
+
+    print(x.Search(45))
+    print(x.Search(23)) 
+    print(x.Search(950))
+    print(x.Search(47))
+    x.Search(99)
+    x.Insert(540)
+
+    print()
+
+    stats_info = x.GetStats()
+    print("STATS")
+    print(stats_info.Count(x.hash_table)) 
+    print(stats_info.Buckets(x.hash_table))
+    print(stats_info.Pages(x.hash_table, x.page_size))
+    print(stats_info.OverflowBuckets(x.hash_table, x.page_size))
+    print(stats_info.SplitCount())
+    print(stats_info.Access())
+    print(stats_info.AccessInsertOnly())
 
 
