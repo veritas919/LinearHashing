@@ -523,6 +523,15 @@ class LinearHashing:
             print("Level", self.level, file = f)
             print("Ptr", self.ptr, file = f)
 
+    def Count(self):
+        # get number of items in the table
+        num_items_in_table = 0
+        for key in self.hash_table:
+            num_items_for_key = len(self.hash_table[key])
+            num_items_in_table += num_items_for_key
+        return num_items_in_table
+
+
     # use for Case 2 
     def get_current_capacity_ratio(self):
         # get number of items in the table
@@ -635,5 +644,6 @@ if __name__ == "__main__":
     print(" about to print in binary.........")
     x.Print() 
     x.PrintFile("output2.txt")
+    print(x.Count())
 
 
