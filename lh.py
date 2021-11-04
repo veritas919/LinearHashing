@@ -566,8 +566,9 @@ class LinearHashing:
 
         # 1 bucket only. Level 0 
         if self.level == 0:
-            # if the bucket is empty return 0
+            # if the bucket is empty return 0. still have to read one page 
             if len(self.hash_table[0]) == 0:
+                self.stats.access += 1 
                 return 0
             else:
                 for i, item in enumerate(self.hash_table[0]):
@@ -585,8 +586,9 @@ class LinearHashing:
             if len(num_as_bin) <= self.level:
                 ht_index_try_1 = num_to_find
                 if ht_index_try_1 in self.hash_table:
-                    # if the bucket to be searched is empty, return 0 
+                    # if the bucket to be searched is empty, return 0. still must read 1 page 
                     if len(self.hash_table[ht_index_try_1]) == 0:
+                        self.stats.access += 1 
                         return 0
                     else:
                         for i, item in enumerate(self.hash_table[ht_index_try_1]):
@@ -607,8 +609,9 @@ class LinearHashing:
                 bigger_last_bits = num_as_bin[-1: -(self.level + 2) : -1][::-1]
                 smaller_last_bits = num_as_bin[-1: -(self.level + 1) : -1][::-1]
                 if int(bigger_last_bits, 2) in self.hash_table:
-                    # if the bucket to be searched is empty, return 0 
+                    # if the bucket to be searched is empty, return 0. takes 1 access to read page  
                     if len(self.hash_table[int(bigger_last_bits, 2)]) == 0:
+                        self.stats.access += 1 
                         return 0
                     else:
                         for i, item in enumerate(self.hash_table[int(bigger_last_bits, 2)]):
@@ -621,8 +624,9 @@ class LinearHashing:
                         self.stats.access += int(math.ceil(len(self.hash_table[int(bigger_last_bits, 2)]) / self.page_size))
                         return -1 * int(math.ceil(len(self.hash_table[int(bigger_last_bits, 2)]) / self.page_size))
                 elif int(smaller_last_bits, 2) in self.hash_table:
-                    # if the bucket to be searched is empty, return 0 
+                    # if the bucket to be searched is empty, return 0. also 1 read. 
                     if len(self.hash_table[int(smaller_last_bits, 2)]) == 0:
+                        self.stats.access += 1 
                         return 0
                     else:
                         for i, item in enumerate(self.hash_table[int(smaller_last_bits, 2)]):
@@ -851,7 +855,7 @@ if __name__ == "__main__":
     print(x.Search(23)) 
     print(x.Search(950))
     print(x.Search(47))
-    x.Search(99)
+    print(x.Search(99)) 
     x.Insert(540)
 
     print()
