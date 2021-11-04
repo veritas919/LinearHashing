@@ -48,3 +48,14 @@ print(int(as_bin,2))
 i = 2
 page_size = 2
 print(int(math.ceil(i + 1 / page_size)))
+
+data = skewnorm.rvs(a = 10, size = 50, scale = 1)
+data = data - min(data)
+data = data / max(data)
+data = data * 100 
+int_array = []
+for item in data:
+    int_array.append(math.floor(item))
+
+print(int_array) 
+print(len(int_array) )

@@ -1,7 +1,9 @@
-# from . import Bucket 
+# https://stackoverflow.com/questions/24854965/create-random-numbers-with-left-skewed-probability-distribution
+# referenced  above site for generating skewed dataset 
 import copy 
 import math 
 import random 
+# from scipy.stats import skewnorm          used for generating skewed distribution 
 
 
 class LinearHashingStats:
@@ -888,13 +890,14 @@ def get_skewed_test_sets():
     for i in range(4):
         a_list_insert = []
         a_list_search = []
-        same_random_num = random.randint(0, 100)
-        # generate and insert nearly 50 of the same numbers
-        for i in range(50):
-            if i == 7  or i == 25 or i == 32:
-                a_list_insert.append(i)
-            else:
-                a_list_insert.append(same_random_num)
+        
+        # generate skewed data. skewed left 10 
+        data = skewnorm.rvs(a = 10, size = 50, scale = 1)
+        data = data - min(data)
+        data = data / max(data)
+        data = data * 100 # data <= 100 
+        for item in data:
+            a_list_insert.append(math.floor(item))
         
         # do 20 searches 
         for i in range(20):
@@ -917,10 +920,26 @@ if __name__ == "__main__":
     #x.random_testing("./random_test_case_0.txt")
 
 
+    '''
     ##################################################################### Getting skewed distribution testing data ###########################################
 
+    (nums_to_insert, nums_to_search) = get_skewed_test_sets()
 
-    '''
+    case_0 = LinearHashing(page_size = 3, policy = 0)
+    case_1 = LinearHashing(page_size = 3, policy = 1, max_overflow = 5)
+    case_2 = LinearHashing(page_size = 3, policy = 2, size_limit = 0.9)
+    case_3 = LinearHashing(page_size = 3, policy = 3)
+    
+    case_0.testing("skewed_case_0.txt", nums_to_insert, nums_to_search)
+    case_1.testing("skewed_case_1.txt", nums_to_insert, nums_to_search)
+    case_2.testing("skewed_case_2.txt", nums_to_insert, nums_to_search)
+    case_3.testing("skewed_case_3.txt", nums_to_insert, nums_to_search)
+
+
+    print("done") 
+
+
+    
     ###################################################################### Getting nearly uniform distribution testing data #######################################
     (nums_to_insert, nums_to_search) = get_nearly_uniform_test_sets()
 
