@@ -1,4 +1,5 @@
 import math
+from scipy.stats import skewnorm  
 num = 8
 
 as_bin = bin(num)[2:]

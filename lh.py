@@ -808,7 +808,7 @@ class LinearHashing:
             print("\n")
 
 
-    def random_testing(self, fileObj, nums_to_insert, nums_to_search):
+    def testing(self, fileObj, nums_to_insert, nums_to_search):
         with open(fileObj, 'w') as f:
             space_utilization_sum = 0 
             
@@ -852,7 +852,61 @@ def get_random_test_sets():
         nums_to_insert.append(a_list_insert)
         nums_to_search_for.append(a_list_search)
 
-    return (nums_to_insert, nums_to_search_for) 
+    return (nums_to_insert, nums_to_search_for)
+
+def get_nearly_uniform_test_sets():
+
+    nums_to_insert = []
+    nums_to_search_for = []
+    # do this test 4 times and find average 
+    for i in range(4):
+        a_list_insert = []
+        a_list_search = []
+        same_random_num = random.randint(0, 100)
+        # generate and insert nearly 50 of the same numbers
+        for i in range(50):
+            if i == 7  or i == 25 or i == 32:
+                a_list_insert.append(i)
+            else:
+                a_list_insert.append(same_random_num)
+        
+        # do 20 searches 
+        for i in range(20):
+            random_num_to_find = random.randint(0,100)
+            a_list_search.append(random_num_to_find)
+        
+        nums_to_insert.append(a_list_insert)
+        nums_to_search_for.append(a_list_search)
+
+    return (nums_to_insert, nums_to_search_for)
+
+def get_skewed_test_sets():
+
+    nums_to_insert = []
+    nums_to_search_for = []
+    # do this test 4 times and find average 
+    for i in range(4):
+        a_list_insert = []
+        a_list_search = []
+        same_random_num = random.randint(0, 100)
+        # generate and insert nearly 50 of the same numbers
+        for i in range(50):
+            if i == 7  or i == 25 or i == 32:
+                a_list_insert.append(i)
+            else:
+                a_list_insert.append(same_random_num)
+        
+        # do 20 searches 
+        for i in range(20):
+            random_num_to_find = random.randint(0,100)
+            a_list_search.append(random_num_to_find)
+        
+        nums_to_insert.append(a_list_insert)
+        nums_to_search_for.append(a_list_search)
+
+    return (nums_to_insert, nums_to_search_for)
+
+
 
 if __name__ == "__main__":
     # x = LinearHashing(page_size = 2, policy = 0, max_overflow = 2)
@@ -863,6 +917,28 @@ if __name__ == "__main__":
     #x.random_testing("./random_test_case_0.txt")
 
 
+    ##################################################################### Getting skewed distribution testing data ###########################################
+
+
+    '''
+    ###################################################################### Getting nearly uniform distribution testing data #######################################
+    (nums_to_insert, nums_to_search) = get_nearly_uniform_test_sets()
+
+    case_0 = LinearHashing(page_size = 3, policy = 0)
+    case_1 = LinearHashing(page_size = 3, policy = 1, max_overflow = 5)
+    case_2 = LinearHashing(page_size = 3, policy = 2, size_limit = 0.9)
+    case_3 = LinearHashing(page_size = 3, policy = 3)
+    
+    case_0.testing("nearly_uniform_case_0.txt", nums_to_insert, nums_to_search)
+    case_1.testing("nearly_uniform_case_1.txt", nums_to_insert, nums_to_search)
+    case_2.testing("nearly_uniform_case_2.txt", nums_to_insert, nums_to_search)
+    case_3.testing("nearly_uniform_case_3.txt", nums_to_insert, nums_to_search)
+
+
+    print("done") 
+
+    
+    #################################################################### Getting random distribution testing data ###################################################### 
     (nums_to_insert, nums_to_search) = get_random_test_sets()
 
     case_0 = LinearHashing(page_size = 3, policy = 0)
@@ -870,15 +946,15 @@ if __name__ == "__main__":
     case_2 = LinearHashing(page_size = 3, policy = 2, size_limit = 0.9)
     case_3 = LinearHashing(page_size = 3, policy = 3)
     
-    case_0.random_testing("random_case_0.txt", nums_to_insert, nums_to_search)
-    case_1.random_testing("random_case_1.txt", nums_to_insert, nums_to_search)
-    case_2.random_testing("random_case_2.txt", nums_to_insert, nums_to_search)
-    case_3.random_testing("random_case_3.txt", nums_to_insert, nums_to_search)
+    case_0.testing("random_case_0.txt", nums_to_insert, nums_to_search)
+    case_1.testing("random_case_1.txt", nums_to_insert, nums_to_search)
+    case_2.testing("random_case_2.txt", nums_to_insert, nums_to_search)
+    case_3.testing("random_case_3.txt", nums_to_insert, nums_to_search)
 
 
     print("done") 
 
-    '''
+    
     x = LinearHashing(page_size = 1, policy = 2, size_limit = 0.7)
 
     x.insert(23)
