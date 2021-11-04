@@ -2,6 +2,25 @@
 import copy 
 import math 
 
+
+class LinearHashingStats:
+
+    def __init__(self):
+        self.count = 0
+        self.buckets = 0
+        self.pages = 0
+        self.overflow_buckets = 0
+        self.access = 0
+        self.access_insert_only = 0
+
+    def  Count(self, hash_table):
+        # get number of items in the table
+        num_items_in_table = 0
+        for key in hash_table:
+            num_items_for_key = len(hash_table[key])
+            num_items_in_table += num_items_for_key 
+        return num_items_in_table 
+
 class LinearHashing:
 
     # constructor
@@ -26,6 +45,8 @@ class LinearHashing:
         self.ptr = 0
         self.max_overflow = max_overflow 
         self.size_limit = size_limit 
+
+        self.stats = LinearHashingStats() 
 
         self.is_an_overflow_rn = False  # dont think I need 
         self.num_buckets_overflowing = 0    # dont think I need 
@@ -686,6 +707,7 @@ class LinearHashing:
                 print(item, end = " ") 
             print("\n")
 
+
 if __name__ == "__main__":
     # x = LinearHashing(page_size = 2, policy = 0, max_overflow = 2)
     # x = LinearHashing(page_size = 2, policy = 1, max_overflow = 0) # should function same as default case 
@@ -752,5 +774,10 @@ if __name__ == "__main__":
     print(x.Search(23)) 
     print(x.Search(950))
     print(x.Search(47))
+
+    print()
+
+    print("STATS")
+    print(x.stats.Count(x.hash_table)) 
 
 
