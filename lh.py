@@ -474,6 +474,30 @@ class LinearHashing:
  
         return split_occured 
 
+
+    ############################################################## Print to console method #######################################################
+
+    def print(self):        
+        for key in self.hash_table:
+            key_binary = bin(key)[2:]
+            print("key", key, end = " binary ")
+            if (key + (2**(self.level)) in self.hash_table):
+                keyStr = key_binary.zfill(self.level + 1)
+            else:
+                keyStr = key_binary.zfill(self.level)
+            print(keyStr, end = " : ")
+
+            count = 0
+            for i, item in enumerate(self.hash_table[key]):
+                print(item, end = " ") 
+                count += 1
+                if count == self.page_size and i != len(self.hash_table[key]) - 1:
+                    print(" --  ", end = "")
+                    count = 0
+            print("\n")
+        print("Level", self.level)
+        print("Ptr", self.ptr)
+
     # use for Case 2 
     def get_current_capacity_ratio(self):
         # get number of items in the table
@@ -537,9 +561,9 @@ class LinearHashing:
 
     def print_ht(self):
         for key in self.hash_table:
-            print("key", key)
+            print("key", key, end = " : ")
             for item in self.hash_table[key]:
-                print(item) 
+                print(item, end = " ") 
             print("\n")
 
 if __name__ == "__main__":
@@ -583,5 +607,7 @@ if __name__ == "__main__":
 
 
     x.print_ht()
+    print(" about to print in binary.........")
+    x.print() 
 
 
