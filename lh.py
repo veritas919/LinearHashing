@@ -24,18 +24,19 @@ class LinearHashing:
         self.policy = policy
         self.level = 0
         self.ptr = 0
-        self.is_an_overflow_rn = False
-        self.num_buckets_overflowing = 0
-        self.num_buckets = 1 # only keeping track of main buckets rn....NOT overflow 
         self.max_overflow = max_overflow 
         self.size_limit = size_limit 
+
+        self.is_an_overflow_rn = False  # dont think I need 
+        self.num_buckets_overflowing = 0    # dont think I need 
+        self.num_buckets = 1 # only keeping track of main buckets rn....NOT overflow. dont think I use this  
 
         print("SIZELIMIT", self.size_limit)
 
         self.hash_table = {}
         self.hash_table [0] = []
 
-    def insert(self, number):
+    def Insert(self, number):
         if self.policy == 0:
             self.case_0_insert(number)
         elif self.policy == 1:
@@ -689,40 +690,54 @@ if __name__ == "__main__":
     # x = LinearHashing(page_size = 2, policy = 0, max_overflow = 2)
     # x = LinearHashing(page_size = 2, policy = 1, max_overflow = 0) # should function same as default case 
     # x = LinearHashing(page_size = 2, policy = 2, size_limit = 0.7)
+    
+    '''
+    x = LinearHashing(page_size = 1, policy = 2, size_limit = 0.7)
+
+    x.insert(23)
+    x.insert(22)
+    x.insert(47)
+    x.Print() 
+    print(x.Search(23))
+    print(x.Search(1))
+    print(x.Search(47))
+    print(x.Search(222222))
+    
+    '''
     x = LinearHashing(page_size = 2, policy = 3)
 
-    x.insert(2)
-    x.insert(0)
-    x.insert(1) 
+    x.Insert(2)
+    x.Insert(0)
+    x.Insert(1) 
     print("bucket #: ", x.get_num_buckets())
-    x.insert(5)
+    x.Insert(5)
     print("bucket #: ", x.get_num_buckets())
-    x.insert(23)
+    x.Insert(23)
     print("bucket #: ", x.get_num_buckets())
-    x.insert(42)
+    x.Insert(42)
     print("bucket #: ", x.get_num_buckets())
-    x.insert(55)
+    x.Insert(55)
     print("bucket #: ", x.get_num_buckets())
-    x.insert(10)
+    x.Insert(10)
     print("bucket #: ", x.get_num_buckets())
     x.print_ht()
-    x.insert(999)
-    x.insert(-13)
-    x.insert(-55)
+    x.Insert(999)
+    x.Insert(-13)
+    x.Insert(-55)
 
     # x.print_ht() 
-    x.insert(43) 
+    x.Insert(43) 
 
     x.print_ht() 
     
-    x.insert(45)
-    x.insert(2328356)
-    x.insert(8) 
-    x.insert(21)
-    x.insert(32)
-    x.insert(2000)
-    x.insert(0)
-    x.insert(1) 
+    x.Insert(45)
+    x.Insert(2328356)
+    x.Insert(8) 
+    x.Insert(21)
+    x.Insert(32)
+    x.Insert(2000)
+    x.Insert(0)
+    x.Insert(1) 
 
 
     x.print_ht()
@@ -737,4 +752,5 @@ if __name__ == "__main__":
     print(x.Search(23)) 
     print(x.Search(950))
     print(x.Search(47))
+
 
