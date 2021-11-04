@@ -739,7 +739,7 @@ class LinearHashing:
     def GetStats(self):
         return self.stats 
 
-
+    ##################################################################### HELPER FUNCTIONS ############################################
 
     # use for Case 2 
     def get_current_capacity_ratio(self):
@@ -753,7 +753,7 @@ class LinearHashing:
         page_number = 0
         for key in self.hash_table:
             num_items_for_key = len(self.hash_table[key])
-            if num_items_for_key == 0: ####################################### if no numbers in key, assume it still starts with 1 page ????????????????? VERIFY THIS 
+            if num_items_for_key == 0: # if no numbers in key, assume we still must read 1 page 
                 page_number += 1
             else:
                 page_number += int(math.ceil(num_items_for_key / self.page_size)) 
@@ -769,23 +769,11 @@ class LinearHashing:
         if bucket_key not in self.hash_table:
             print("error...key not in table. can't check for overflow")
         else:
-            if len(self.hash_table[bucket_key]) > self.page_size: #overrflow!)
+            if len(self.hash_table[bucket_key]) > self.page_size: #overrflow!
                 return True 
             else:
                 return False 
             
-        '''
-        flag = False 
-        for key in self.hash_table:
-                if len(self.hash_table[key]) > self.page_size: #overrflow!
-                    self.is_an_overflow_rn = True
-                    flag = True
-        if flag == True:
-            self.is_an_overflow_rn = True
-        else:
-            self.is_an_overflow_rn = False 
-
-        '''
 
     def get_total_number_of_overflow_buckets(self):
         num_overflow = 0
@@ -798,8 +786,6 @@ class LinearHashing:
 
         print("num overflow: ", num_overflow)
         return num_overflow 
-
-
 
 
     def print_ht(self):
@@ -833,6 +819,8 @@ class LinearHashing:
             print("Average Access: ", average_access, file = f)
             print("Average Space Utilization: ", avg_space_utilization, file = f)
 
+#################################################################### Non-class functions used for testing ##################################
+
 # generate random data sets to use for all tests 
 def get_random_test_sets():
     nums_to_insert = []
@@ -856,6 +844,7 @@ def get_random_test_sets():
 
     return (nums_to_insert, nums_to_search_for)
 
+# generate nearly unifornly distributed test data sets 
 def get_nearly_uniform_test_sets():
 
     nums_to_insert = []
@@ -882,6 +871,7 @@ def get_nearly_uniform_test_sets():
 
     return (nums_to_insert, nums_to_search_for)
 
+# generate skewed data sets 
 def get_skewed_test_sets():
 
     nums_to_insert = []
@@ -892,7 +882,7 @@ def get_skewed_test_sets():
         a_list_search = []
         
         # generate skewed data. skewed left 10 
-        data = skewnorm.rvs(a = 10, size = 50, scale = 1)
+        data = skewnorm.rvs(a = 10, size = 50, scale = 1)   # uncomment line that imports skewnorm at top if you want to run this 
         data = data - min(data)
         data = data / max(data)
         data = data * 100 # data <= 100 
@@ -985,6 +975,7 @@ if __name__ == "__main__":
     print(x.Search(47))
     print(x.Search(222222))
     
+    '''
     
     x = LinearHashing(page_size = 2, policy = 3)
 
@@ -1055,7 +1046,6 @@ if __name__ == "__main__":
     print(stats_info.AccessInsertOnly())
     print(stats_info.SpaceUtilization())
 
-    ''' 
 
 
 
