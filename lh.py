@@ -57,6 +57,12 @@ class LinearHashingStats:
     def SplitCount(self):
         return self.split_count 
 
+    def Access(self):
+        return self.access 
+
+    def AccessInsertOnly(self):
+        return self.access_insert_only
+
 
 
 
@@ -97,14 +103,23 @@ class LinearHashing:
         self.hash_table [0] = []
 
     def Insert(self, number):
+        # call appropriate insert function. Also increment access by one 
         if self.policy == 0:
             self.case_0_insert(number)
+            self.stats.access += 1
+            self.stats.access_insert_only += 1 
         elif self.policy == 1:
-            self.case_1_insert(number) 
+            self.case_1_insert(number)
+            self.stats.access += 1 
+            self.stats.access_insert_only += 1 
         elif self.policy == 2:
-            self.case_2_insert(number) 
+            self.case_2_insert(number)
+            self.stats.access += 1 
+            self.stats.access_insert_only += 1 
         elif self.policy == 3:
             self.case_3_insert(number)
+            self.stats.access += 1
+            self.stats.access_insert_only += 1 
         else:
             print("invalid value for policy.")
 
@@ -557,9 +572,11 @@ class LinearHashing:
             else:
                 for i, item in enumerate(self.hash_table[0]):
                     if item == num_to_find:
-                        pages_accessed = int(math.ceil((i + 1) / self.page_size)) 
+                        pages_accessed = int(math.ceil((i + 1) / self.page_size))
+                        self.stats.access += pages_accessed 
                         return pages_accessed
                 # number not found in bucket 
+                self.stats.access += int(math.ceil(len(self.hash_table[0]) / self.page_size))
                 return -1 * int(math.ceil(len(self.hash_table[0]) / self.page_size))
         
         # level >= 1         
@@ -574,10 +591,12 @@ class LinearHashing:
                     else:
                         for i, item in enumerate(self.hash_table[ht_index_try_1]):
                             if item == num_to_find:
-                                pages_accessed = int(math.ceil((i + 1) / self.page_size)) 
+                                pages_accessed = int(math.ceil((i + 1) / self.page_size))
+                                self.stats.access += pages_accessed  
                                 return pages_accessed
 
                         # number not found in bucket
+                        self.stats.access += int(math.ceil(len(self.hash_table[ht_index_try_1]) / self.page_size))
                         return -1 * int(math.ceil(len(self.hash_table[ht_index_try_1]) / self.page_size))
                     
                 else:
@@ -594,10 +613,12 @@ class LinearHashing:
                     else:
                         for i, item in enumerate(self.hash_table[int(bigger_last_bits, 2)]):
                             if item == num_to_find:
-                                pages_accessed = int(math.ceil((i + 1) / self.page_size)) 
+                                pages_accessed = int(math.ceil((i + 1) / self.page_size))
+                                self.stats.access += pages_accessed  
                                 return pages_accessed
 
                         # number not found in bucket
+                        self.stats.access += int(math.ceil(len(self.hash_table[int(bigger_last_bits, 2)]) / self.page_size))
                         return -1 * int(math.ceil(len(self.hash_table[int(bigger_last_bits, 2)]) / self.page_size))
                 elif int(smaller_last_bits, 2) in self.hash_table:
                     # if the bucket to be searched is empty, return 0 
@@ -606,10 +627,12 @@ class LinearHashing:
                     else:
                         for i, item in enumerate(self.hash_table[int(smaller_last_bits, 2)]):
                             if item == num_to_find:
-                                pages_accessed = int(math.ceil((i + 1) / self.page_size)) 
+                                pages_accessed = int(math.ceil((i + 1) / self.page_size))
+                                self.stats.access += pages_accessed  
                                 return pages_accessed
 
                         # number not found in bucket
+                        self.stats.access += int(math.ceil(len(self.hash_table[int(smaller_last_bits, 2)]) / self.page_size))
                         return -1 * int(math.ceil(len(self.hash_table[int(smaller_last_bits, 2)]) / self.page_size))
                     
                 else:
@@ -683,6 +706,10 @@ class LinearHashing:
             return results
         else:
             print("problem in ListBucket...bucket_key passed in as param not a key in hash table")
+
+    ###################################################################### GetStats #################################################
+    def GetStats(self):
+        return self.stats 
 
 
 
@@ -824,14 +851,19 @@ if __name__ == "__main__":
     print(x.Search(23)) 
     print(x.Search(950))
     print(x.Search(47))
+    x.Search(99)
+    x.Insert(540)
 
     print()
 
+    stats_info = x.GetStats()
     print("STATS")
-    print(x.stats.Count(x.hash_table)) 
-    print(x.stats.Buckets(x.hash_table))
-    print(x.stats.Pages(x.hash_table, x.page_size))
-    print(x.stats.OverflowBuckets(x.hash_table, x.page_size))
-    print(x.stats.SplitCount())
+    print(stats_info.Count(x.hash_table)) 
+    print(stats_info.Buckets(x.hash_table))
+    print(stats_info.Pages(x.hash_table, x.page_size))
+    print(stats_info.OverflowBuckets(x.hash_table, x.page_size))
+    print(stats_info.SplitCount())
+    print(stats_info.Access())
+    print(stats_info.AccessInsertOnly())
 
 
