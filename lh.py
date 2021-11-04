@@ -13,13 +13,22 @@ class LinearHashingStats:
         self.access = 0
         self.access_insert_only = 0
 
-    def  Count(self, hash_table):
+    # return # of items in hash table
+    def Count(self, hash_table):
         # get number of items in the table
         num_items_in_table = 0
         for key in hash_table:
             num_items_for_key = len(hash_table[key])
             num_items_in_table += num_items_for_key 
-        return num_items_in_table 
+        return num_items_in_table
+
+    # return # of main buckets ... NOT counting overflow. doesnt matter if bucket is empty or not....it counts  
+    def Buckets(self, hash_table):
+        num_keys = 0
+        for key in hash_table:
+            num_keys += 1
+        return num_keys 
+
 
 class LinearHashing:
 
@@ -779,5 +788,6 @@ if __name__ == "__main__":
 
     print("STATS")
     print(x.stats.Count(x.hash_table)) 
+    print(x.stats.Buckets(x.hash_table))
 
 
