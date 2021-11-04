@@ -5,7 +5,7 @@ import math
 
 class LinearHashingStats:
 
-    def __init__(self):
+    def __init__(self, hash_table, page_size):
         self.count = 0
         self.buckets = 0
         self.pages = 0
@@ -14,41 +14,44 @@ class LinearHashingStats:
         self.access_insert_only = 0
         self.split_count = 0 
 
+        self.hash_table = hash_table
+        self.page_size = page_size 
+
     # return # of items in hash table
-    def Count(self, hash_table):
+    def Count(self):
         # get number of items in the table
         num_items_in_table = 0
-        for key in hash_table:
-            num_items_for_key = len(hash_table[key])
+        for key in self.hash_table:
+            num_items_for_key = len(self.hash_table[key])
             num_items_in_table += num_items_for_key 
         return num_items_in_table
 
     # return # of main buckets ... NOT counting overflow. doesnt matter if bucket is empty or not....it counts  
-    def Buckets(self, hash_table):
+    def Buckets(self):
         num_keys = 0
-        for key in hash_table:
+        for key in self.hash_table:
             num_keys += 1
         return num_keys 
 
     # returns # of pages in table. If bucket has no numbers in it, it still has 1 page 
-    def Pages(self, hash_table, page_size):
+    def Pages(self):
         # get number of pages in table
         page_number = 0
-        for key in hash_table:
-            num_items_for_key = len(hash_table[key])
+        for key in self.hash_table:
+            num_items_for_key = len(self.hash_table[key])
             if num_items_for_key == 0: 
                 page_number += 1
             else:
-                page_number += int(math.ceil(num_items_for_key / page_size)) 
+                page_number += int(math.ceil(num_items_for_key / self.page_size)) 
         return page_number 
 
-    def OverflowBuckets(self, hash_table, page_size):
+    def OverflowBuckets(self):
         num_overflow = 0
-        for key in hash_table:
-            num_items_for_key = len(hash_table[key])
+        for key in self.hash_table:
+            num_items_for_key = len(self.hash_table[key])
             if num_items_for_key == 0:
                 continue
-            overflow_for_that_key = int(math.ceil(num_items_for_key / page_size)) - 1
+            overflow_for_that_key = int(math.ceil(num_items_for_key / self.page_size)) - 1
             num_overflow += overflow_for_that_key 
 
         # print("num overflow: ", num_overflow)
@@ -91,8 +94,6 @@ class LinearHashing:
         self.max_overflow = max_overflow 
         self.size_limit = size_limit 
 
-        self.stats = LinearHashingStats() 
-
         self.is_an_overflow_rn = False  # dont think I need 
         self.num_buckets_overflowing = 0    # dont think I need 
         self.num_buckets = 1 # only keeping track of main buckets rn....NOT overflow. dont think I use this  
@@ -101,6 +102,8 @@ class LinearHashing:
 
         self.hash_table = {}
         self.hash_table [0] = []
+
+        self.stats = LinearHashingStats(hash_table=self.hash_table, page_size=self.page_size) 
 
     def Insert(self, number):
         # call appropriate insert function. Also increment access by one 
@@ -843,13 +846,13 @@ if __name__ == "__main__":
 
 
 
-    x.print_ht()
+    #x.print_ht()
     print(" about to print in binary.........")
-    x.Print() 
+    #x.Print() 
     x.PrintFile("output2.txt")
-    print(x.Count())
+    #print(x.Count())
     arr = x.ListBucket(5)
-    print(arr) 
+    #print(arr) 
 
     print(x.Search(45))
     print(x.Search(23)) 
@@ -859,15 +862,18 @@ if __name__ == "__main__":
     x.Insert(540)
 
     print()
+    x.Print()
 
     stats_info = x.GetStats()
     print("STATS")
-    print(stats_info.Count(x.hash_table)) 
-    print(stats_info.Buckets(x.hash_table))
-    print(stats_info.Pages(x.hash_table, x.page_size))
-    print(stats_info.OverflowBuckets(x.hash_table, x.page_size))
+
+    print("count", stats_info.Count())
+    print(stats_info.Buckets())
+    print(stats_info.Pages())
+    print(stats_info.OverflowBuckets())
     print(stats_info.SplitCount())
     print(stats_info.Access())
     print(stats_info.AccessInsertOnly())
+
 
 
