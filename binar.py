@@ -43,3 +43,7 @@ print(type(as_bin))
 print(as_bin) 
 
 print(int(as_bin,2))
+
+i = 2
+page_size = 2
+print(int(math.ceil(i + 1 / page_size)))

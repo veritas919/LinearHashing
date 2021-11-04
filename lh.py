@@ -475,6 +475,78 @@ class LinearHashing:
         return split_occured 
 
 
+    ############################################################## Search #################################################################
+    def Search(self, num_to_find):
+        num_as_bin = bin(num_to_find)[2:]
+        pages_accessed = 0
+
+        # 1 bucket only. Level 0 
+        if self.level == 0:
+            # if the bucket is empty return 0
+            if len(self.hash_table[0]) == 0:
+                return 0
+            else:
+                for i, item in enumerate(self.hash_table[0]):
+                    if item == num_to_find:
+                        pages_accessed = int(math.ceil((i + 1) / self.page_size)) 
+                        return pages_accessed
+                # number not found in bucket 
+                return -1 * int(math.ceil(len(self.hash_table[0]) / self.page_size))
+        
+        # level >= 1         
+        else:
+            # bucket_key = None 
+            if len(num_as_bin) <= self.level:
+                ht_index_try_1 = num_to_find
+                if ht_index_try_1 in self.hash_table:
+                    # if the bucket to be searched is empty, return 0 
+                    if len(self.hash_table[ht_index_try_1]) == 0:
+                        return 0
+                    else:
+                        for i, item in enumerate(self.hash_table[ht_index_try_1]):
+                            if item == num_to_find:
+                                pages_accessed = int(math.ceil((i + 1) / self.page_size)) 
+                                return pages_accessed
+
+                        # number not found in bucket
+                        return -1 * int(math.ceil(len(self.hash_table[ht_index_try_1]) / self.page_size))
+                    
+                else:
+                    print("in search. cant find matching bucket key")
+
+            # number as binary is necessarily >= 2 
+            else: 
+                bigger_last_bits = num_as_bin[-1: -(self.level + 2) : -1][::-1]
+                smaller_last_bits = num_as_bin[-1: -(self.level + 1) : -1][::-1]
+                if int(bigger_last_bits, 2) in self.hash_table:
+                    # if the bucket to be searched is empty, return 0 
+                    if len(self.hash_table[int(bigger_last_bits, 2)]) == 0:
+                        return 0
+                    else:
+                        for i, item in enumerate(self.hash_table[int(bigger_last_bits, 2)]):
+                            if item == num_to_find:
+                                pages_accessed = int(math.ceil((i + 1) / self.page_size)) 
+                                return pages_accessed
+
+                        # number not found in bucket
+                        return -1 * int(math.ceil(len(self.hash_table[int(bigger_last_bits, 2)]) / self.page_size))
+                elif int(smaller_last_bits, 2) in self.hash_table:
+                    # if the bucket to be searched is empty, return 0 
+                    if len(self.hash_table[int(smaller_last_bits, 2)]) == 0:
+                        return 0
+                    else:
+                        for i, item in enumerate(self.hash_table[int(smaller_last_bits, 2)]):
+                            if item == num_to_find:
+                                pages_accessed = int(math.ceil((i + 1) / self.page_size)) 
+                                return pages_accessed
+
+                        # number not found in bucket
+                        return -1 * int(math.ceil(len(self.hash_table[int(smaller_last_bits, 2)]) / self.page_size))
+                    
+                else:
+                    print("problem. number is....:", num_to_find, bigger_last_bits, smaller_last_bits)
+        
+
     ############################################################## Print to console method #######################################################
     # note: I print -- in between pages / overflow buckets 
     def Print(self):        
@@ -523,6 +595,8 @@ class LinearHashing:
             print("Level", self.level, file = f)
             print("Ptr", self.ptr, file = f)
 
+    ####################################################################### Count ####################################################
+    # returns number of items in hash table 
     def Count(self):
         # get number of items in the table
         num_items_in_table = 0
@@ -530,6 +604,17 @@ class LinearHashing:
             num_items_for_key = len(self.hash_table[key])
             num_items_in_table += num_items_for_key
         return num_items_in_table
+
+    ####################################################################### ListBucket ##################################################
+    # takes an integer representing the key. for ex. 7
+    # returns all numbers in the bucket for that key 
+    def ListBucket(self, bucket_key):
+        if bucket_key in self.hash_table:
+            results = self.hash_table[bucket_key]
+            return results
+        else:
+            print("problem in ListBucket...bucket_key passed in as param not a key in hash table")
+
 
 
     # use for Case 2 
@@ -645,5 +730,11 @@ if __name__ == "__main__":
     x.Print() 
     x.PrintFile("output2.txt")
     print(x.Count())
+    arr = x.ListBucket(5)
+    print(arr) 
 
+    print(x.Search(45))
+    print(x.Search(23)) 
+    print(x.Search(950))
+    print(x.Search(47))
 
