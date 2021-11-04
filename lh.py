@@ -476,8 +476,8 @@ class LinearHashing:
 
 
     ############################################################## Print to console method #######################################################
-
-    def print(self):        
+    # note: I print -- in between pages / overflow buckets 
+    def Print(self):        
         for key in self.hash_table:
             key_binary = bin(key)[2:]
             print("key", key, end = " binary ")
@@ -497,6 +497,31 @@ class LinearHashing:
             print("\n")
         print("Level", self.level)
         print("Ptr", self.ptr)
+
+    #################################################### Print to file object ##########################
+    # note: I print -- in between pages / overflow buckets
+    def PrintFile(self, fileObj):        
+        with open(fileObj, 'w') as f:
+            for key in self.hash_table:
+                key_binary = bin(key)[2:]
+                print("key", key, end = " binary ", file = f)
+                if (key + (2**(self.level)) in self.hash_table):
+                    keyStr = key_binary.zfill(self.level + 1)
+                else:
+                    keyStr = key_binary.zfill(self.level)
+                print(keyStr, end = " : ", file = f)
+
+                count = 0
+                for i, item in enumerate(self.hash_table[key]):
+                    print(item, end = " ", file = f) 
+                    count += 1
+                    if count == self.page_size and i != len(self.hash_table[key]) - 1:
+                        print(" --  ", end = "", file = f)
+                        count = 0
+                print("\n", file = f)
+            
+            print("Level", self.level, file = f)
+            print("Ptr", self.ptr, file = f)
 
     # use for Case 2 
     def get_current_capacity_ratio(self):
@@ -608,6 +633,7 @@ if __name__ == "__main__":
 
     x.print_ht()
     print(" about to print in binary.........")
-    x.print() 
+    x.Print() 
+    x.PrintFile("output2.txt")
 
 
