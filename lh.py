@@ -1,6 +1,7 @@
 # from . import Bucket 
 import copy 
 import math 
+import random 
 
 
 class LinearHashingStats:
@@ -66,6 +67,24 @@ class LinearHashingStats:
     def AccessInsertOnly(self):
         return self.access_insert_only
 
+    def SpaceUtilization(self):
+        # get number of items in the table
+        num_items_in_table = 0
+        for key in self.hash_table:
+            num_items_for_key = len(self.hash_table[key])
+            num_items_in_table += num_items_for_key
+        
+        # get number of pages in table
+        page_number = 0
+        for key in self.hash_table:
+            num_items_for_key = len(self.hash_table[key])
+            if num_items_for_key == 0: # if no numbers in key, assume it still has 1 page 
+                page_number += 1
+            else:
+                page_number += int(math.ceil(num_items_for_key / self.page_size)) 
+
+        current_capacity = (num_items_in_table) / (page_number * self.page_size)
+        return current_capacity       
 
 
 
@@ -156,7 +175,7 @@ class LinearHashing:
                 self.ptr = 0 
                 self.num_buckets += 1
                 split_occured = True
-                self.stats += 1 # update stats object  
+                self.stats.split_count += 1 # update stats object  
 
                 # self.isOverflowedRightNow()   # MUST RECHECK    WORKS FINE WITHOUT @@@@@@@@@@@@ TAKE OUT TEMP 
 
@@ -789,11 +808,76 @@ class LinearHashing:
             print("\n")
 
 
+    def random_testing(self, fileObj, nums_to_insert, nums_to_search):
+        with open(fileObj, 'w') as f:
+            space_utilization_sum = 0 
+            
+            # do this test 4 times and find average 
+            for i in range(4):
+                
+                to_insert = nums_to_insert[i]
+                for item in to_insert:
+                    self.Insert(item)
+                
+                to_search = nums_to_search[i]
+                for item in to_search:
+                    self.Search(item)
+            
+                space_utilization_sum += self.stats.SpaceUtilization() 
+            
+            average_access = self.stats.access / 4 
+            avg_space_utilization = space_utilization_sum / 4 
+
+            print("Average Access: ", average_access, file = f)
+            print("Average Space Utilization: ", avg_space_utilization, file = f)
+
+# generate random data sets to use for all tests 
+def get_random_test_sets():
+    nums_to_insert = []
+    nums_to_search_for = []
+    # do this test 4 times and find average 
+    for i in range(4):
+        a_list_insert = []
+        a_list_search = []
+        # generate and insert 50 random numbers
+        for i in range(50):
+            random_num = random.randint(0, 100)
+            a_list_insert.append(random_num)
+        
+        # do 20 searches 
+        for i in range(20):
+            random_num_to_find = random.randint(0,100)
+            a_list_search.append(random_num_to_find)
+        
+        nums_to_insert.append(a_list_insert)
+        nums_to_search_for.append(a_list_search)
+
+    return (nums_to_insert, nums_to_search_for) 
+
 if __name__ == "__main__":
     # x = LinearHashing(page_size = 2, policy = 0, max_overflow = 2)
     # x = LinearHashing(page_size = 2, policy = 1, max_overflow = 0) # should function same as default case 
     # x = LinearHashing(page_size = 2, policy = 2, size_limit = 0.7)
+
+    #x = LinearHashing(page_size = 3, policy = 0)
+    #x.random_testing("./random_test_case_0.txt")
+
+
+    (nums_to_insert, nums_to_search) = get_random_test_sets()
+
+    case_0 = LinearHashing(page_size = 3, policy = 0)
+    case_1 = LinearHashing(page_size = 3, policy = 1, max_overflow = 5)
+    case_2 = LinearHashing(page_size = 3, policy = 2, size_limit = 0.9)
+    case_3 = LinearHashing(page_size = 3, policy = 3)
     
+    case_0.random_testing("random_case_0.txt", nums_to_insert, nums_to_search)
+    case_1.random_testing("random_case_1.txt", nums_to_insert, nums_to_search)
+    case_2.random_testing("random_case_2.txt", nums_to_insert, nums_to_search)
+    case_3.random_testing("random_case_3.txt", nums_to_insert, nums_to_search)
+
+
+    print("done") 
+
     '''
     x = LinearHashing(page_size = 1, policy = 2, size_limit = 0.7)
 
@@ -806,7 +890,7 @@ if __name__ == "__main__":
     print(x.Search(47))
     print(x.Search(222222))
     
-    '''
+    
     x = LinearHashing(page_size = 2, policy = 3)
 
     x.Insert(2)
@@ -874,6 +958,9 @@ if __name__ == "__main__":
     print(stats_info.SplitCount())
     print(stats_info.Access())
     print(stats_info.AccessInsertOnly())
+    print(stats_info.SpaceUtilization())
+
+    ''' 
 
 
 
