@@ -901,7 +901,7 @@ def get_skewed_test_sets():
 
 if __name__ == "__main__":
     # x = LinearHashing(page_size = 2, policy = 0, max_overflow = 2)
-    # x = LinearHashing(page_size = 2, policy = 1, max_overflow = 0) # should function same as default case 
+    # x = LinearHashing(page_size = 2, policy = 1, max_overflow = 0)
     # x = LinearHashing(page_size = 2, policy = 2, size_limit = 0.7)
 
     '''
