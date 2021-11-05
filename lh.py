@@ -151,6 +151,134 @@ class LinearHashing:
         else:
             print("invalid value for policy.")
 
+    ########################################################################## GENERAL INSERT ####################################
+    def general_insert(self, num):
+        split_occured = False
+        #print("in case 0")
+        
+        # for level 0 
+        if self.level == 0:
+            # Insert number 
+            self.hash_table[0].append(num) # add number 
+            # check if any bucket is overflowing 
+                # if there is an overflow  ----- > create new bucket, rehash, level up, reset ptr 
+            if self.check(self.policy) == True:  ######3 @@@@~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                self.hash_table[1] = [] # create new bucket 
+
+                copy_of_bucket_0 = copy.deepcopy(self.hash_table[0])
+                bucket_0 = []
+                bucket_1 = []
+                for item in copy_of_bucket_0:
+                    # print(item)
+                    if item % 2 == 0:
+                        bucket_0.append(item)
+                    else:
+                        bucket_1.append(item) 
+                self.hash_table[0] = bucket_0
+                self.hash_table[1] = bucket_1 
+                self.level = 1
+                self.ptr = 0 
+                self.num_buckets += 1
+                split_occured = True
+                self.stats.split_count += 1 # update stats object  
+ 
+
+        # for other levels
+        else:             
+            ############ INSERT NUMBER INTO BUCKET ############
+            num_as_bin = bin(num)[2:]
+            
+            bucket_key = None 
+            if len(num_as_bin) <= self.level:
+                ht_index_try_1 = num
+                if ht_index_try_1 in self.hash_table:
+                    self.hash_table[ht_index_try_1].append(num)
+                    bucket_key = ht_index_try_1
+                else:
+                    print("cant find matching bucket")
+
+            # number as binary is necessarily >= 2 
+            else: 
+                bigger_last_bits = num_as_bin[-1: -(self.level + 2) : -1][::-1]
+                smaller_last_bits = num_as_bin[-1: -(self.level + 1) : -1][::-1]
+                if int(bigger_last_bits, 2) in self.hash_table:
+                    self.hash_table[int(bigger_last_bits,2)].append(num)
+                    bucket_key = int(bigger_last_bits,2)
+                elif int(smaller_last_bits, 2) in self.hash_table:
+                    self.hash_table[int(smaller_last_bits,2)].append(num) 
+                    bucket_key = int(smaller_last_bits,2)
+                else:
+                    print("problem. number is....:", num, bigger_last_bits, smaller_last_bits)
+
+
+            # if split condition holds  ----- > create new bucket, rehash, move ptr. Check if leveling up, and if so, reset ptr
+            if self.check(bucket_key) == True:
+                # print("spliting bucket: ", )
+                bin_of_ptr =  bin(self.ptr)[2:]
+
+                new_bucket_value_0 = self.ptr
+                new_bucket_value_1 = self.ptr + 2**(self.level)
+
+                # rehash 
+                copy_of_bucket_being_split = copy.deepcopy(self.hash_table[self.ptr])
+                bucket_0 = []
+                bucket_1 = []
+                for item in copy_of_bucket_being_split:
+                    # print("item in splitting bucket...",item)
+                    item_as_bin = bin(item)[2:]
+
+                    if len(item_as_bin) <= self.level + 1:
+                        k_bits_as_int = item 
+                    else:
+                        k_bits_as_int = int(item_as_bin[-1: -(self.level + 2) : -1][::-1], 2)
+                    
+                    if k_bits_as_int == new_bucket_value_0:
+                        bucket_0.append(item)
+                    elif k_bits_as_int == new_bucket_value_1:
+                        bucket_1.append(item)
+                    else:
+                        print("problemo. item val is: ", item) 
+
+                self.hash_table[new_bucket_value_0] = bucket_0
+                self.hash_table[new_bucket_value_1] = bucket_1 
+                
+                self.num_buckets += 1
+                self.ptr +=1 
+                split_occured = True 
+                self.stats.split_count += 1
+                # post split, check if next level now
+                if self.num_buckets == 2**(self.level+1):
+                    #print("incrementing level")
+                    #print(self.num_buckets) 
+                    self.level += 1
+                    self.ptr = 0
+
+                
+        return split_occured 
+    ################################################### Checks Splitting Condition Based on Policy ##############################
+    def check(self, bucket_key):
+        if self.policy == 0:
+            if self.level == 0:
+                if self.isOverflowed_RightNow(0)
+                    return True
+            else:
+                if self.isOverflowedRightNow(bucket_key):
+                    return True 
+        
+        elif self.policy == 1:
+            if self.get_total_number_of_overflow_buckets() >= self.max_overflow:
+                return True
+        
+        elif self.policy == 2:
+            if self.get_current_capacity_ratio() >= self.size_limit:
+                return True
+        
+        elif self.policy == 3:
+            if self.isOverflowed_RightNow(self.ptr) == True:
+                return True
+
+        return False           
+
     ######################################################################### CASE 0 INSERT ##########################################################################
     def case_0_insert(self, num):
         split_occured = False
@@ -296,8 +424,6 @@ class LinearHashing:
 
         # for other levels
         else: 
-            #print("else", num)
-            #print("Level is: ", self.level)
             
             ############ INSERT NUMBER INTO BUCKET ############
             num_as_bin = bin(num)[2:]
@@ -403,8 +529,6 @@ class LinearHashing:
 
         # for other levels
         else: 
-            #print("else", num)
-            #print("Level is: ", self.level)
             
             ############ INSERT NUMBER INTO BUCKET ############
             num_as_bin = bin(num)[2:]
