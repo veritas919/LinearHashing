@@ -904,8 +904,8 @@ if __name__ == "__main__":
     # x = LinearHashing(page_size = 2, policy = 1, max_overflow = 0) # should function same as default case 
     # x = LinearHashing(page_size = 2, policy = 2, size_limit = 0.7)
 
-    
-    x = LinearHashing(page_size = 4, policy = 3)
+    '''
+    x = LinearHashing(page_size = 4, policy = 2, size_limit=0.85)
 
     x.Insert(2)
     x.Insert(0)
@@ -956,7 +956,7 @@ if __name__ == "__main__":
     print(stats_info.AccessInsertOnly())
     print(stats_info.SpaceUtilization())
 
-    '''
+
     ##################################################################### Getting skewed distribution testing data ###########################################
 
     (nums_to_insert, nums_to_search) = get_skewed_test_sets()
