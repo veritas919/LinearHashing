@@ -904,9 +904,57 @@ if __name__ == "__main__":
     # x = LinearHashing(page_size = 2, policy = 1, max_overflow = 0) # should function same as default case 
     # x = LinearHashing(page_size = 2, policy = 2, size_limit = 0.7)
 
-    #x = LinearHashing(page_size = 3, policy = 0)
-    #x.random_testing("./random_test_case_0.txt")
+    
+    x = LinearHashing(page_size = 4, policy = 3)
 
+    x.Insert(2)
+    x.Insert(0)
+    x.Insert(1) 
+    x.Insert(5)
+    x.Insert(23)
+    x.Insert(42)
+    x.Insert(55)
+    x.Insert(10)
+
+    x.Insert(999)
+    x.Insert(-13)
+    x.Insert(-55)
+    x.Insert(43) 
+    
+    x.Insert(45)
+    x.Insert(2328356)
+    x.Insert(8) 
+    x.Insert(21)
+    x.Insert(32)
+    x.Insert(2000)
+    x.Insert(0)
+    x.Insert(1) 
+    x.Insert(55)
+    x.Insert(-55) 
+
+    x.PrintFile("output2.txt")
+    arr = x.ListBucket(5)
+
+    print(x.Search(45))
+    print(x.Search(23)) 
+    print(x.Search(950))
+    print(x.Search(47))
+    print(x.Search(99)) 
+    x.Insert(540)
+
+    x.Print()
+
+    stats_info = x.GetStats()
+    print("STATS~~~~~~~~~~~~~")
+
+    print("count", stats_info.Count())
+    print(stats_info.Buckets())
+    print(stats_info.Pages())
+    print(stats_info.OverflowBuckets())
+    print(stats_info.SplitCount())
+    print(stats_info.Access())
+    print(stats_info.AccessInsertOnly())
+    print(stats_info.SpaceUtilization())
 
     '''
     ##################################################################### Getting skewed distribution testing data ###########################################
@@ -925,7 +973,6 @@ if __name__ == "__main__":
 
 
     print("done") 
-
 
     
     ###################################################################### Getting nearly uniform distribution testing data #######################################
@@ -960,72 +1007,9 @@ if __name__ == "__main__":
 
 
     print("done") 
-
-    
-    x = LinearHashing(page_size = 1, policy = 2, size_limit = 0.7)
-
-    x.insert(23)
-    x.insert(22)
-    x.insert(47)
-    x.Print() 
-    print(x.Search(23))
-    print(x.Search(1))
-    print(x.Search(47))
-    print(x.Search(222222))
     
     '''
     
-    x = LinearHashing(page_size = 4, policy = 3)
-
-    x.Insert(2)
-    x.Insert(0)
-    x.Insert(1) 
-    x.Insert(5)
-    x.Insert(23)
-    x.Insert(42)
-    x.Insert(55)
-    x.Insert(10)
-
-    x.Insert(999)
-    x.Insert(-13)
-    x.Insert(-55)
-    x.Insert(43) 
-    
-    x.Insert(45)
-    x.Insert(2328356)
-    x.Insert(8) 
-    x.Insert(21)
-    x.Insert(32)
-    x.Insert(2000)
-    x.Insert(0)
-    x.Insert(1) 
-    x.Insert(55)
-    x.Insert(-55) 
-
-    x.PrintFile("output2.txt")
-    arr = x.ListBucket(5)
-
-
-    print(x.Search(45))
-    print(x.Search(23)) 
-    print(x.Search(950))
-    print(x.Search(47))
-    print(x.Search(99)) 
-    x.Insert(540)
-
-    x.Print()
-
-    stats_info = x.GetStats()
-    print("STATS~~~~~~~~~~~~~")
-
-    print("count", stats_info.Count())
-    print(stats_info.Buckets())
-    print(stats_info.Pages())
-    print(stats_info.OverflowBuckets())
-    print(stats_info.SplitCount())
-    print(stats_info.Access())
-    print(stats_info.AccessInsertOnly())
-    print(stats_info.SpaceUtilization())
 
 
 
