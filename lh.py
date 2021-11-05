@@ -115,61 +115,34 @@ class LinearHashing:
         self.max_overflow = max_overflow 
         self.size_limit = size_limit 
 
-        self.is_an_overflow_rn = False  # dont think I need 
-        self.num_buckets_overflowing = 0    # dont think I need 
-        self.num_buckets = 1 # only keeping track of main buckets rn....NOT overflow. dont think I use this  
-
-        #print("SIZELIMIT", self.size_limit)
+        self.is_an_overflow_rn = False 
+        self.num_buckets_overflowing = 0    
+        self.num_buckets = 1 # keeping track of main buckets rn....NOT overflow. used to det to level up   
 
         self.hash_table = {}
         self.hash_table [0] = []
 
         self.stats = LinearHashingStats(hash_table=self.hash_table, page_size=self.page_size) 
 
-    def Insert(self, number):
-        # call appropriate insert function. Also increment access by one. told to not include splitting in access or accessInsertOnly stats  
-        if self.policy == 0:
-            res = self.case_0_insert(number)
-            self.stats.access += 1
-            self.stats.access_insert_only += 1 
-            return res
-        elif self.policy == 1:
-            res = self.case_1_insert(number)
-            self.stats.access += 1 
-            self.stats.access_insert_only += 1
-            return res 
-        elif self.policy == 2:
-            res = self.case_2_insert(number)
-            self.stats.access += 1 
-            self.stats.access_insert_only += 1 
-            return res
-        elif self.policy == 3:
-            res = self.case_3_insert(number)
-            self.stats.access += 1
-            self.stats.access_insert_only += 1 
-            return res 
-        else:
-            print("invalid value for policy.")
-
     ########################################################################## GENERAL INSERT ####################################
     def general_insert(self, num):
         split_occured = False
-        #print("in case 0")
+        self.stats.access_insert_only += 1 
+        self.stats.access += 1 
         
         # for level 0 
         if self.level == 0:
             # Insert number 
             self.hash_table[0].append(num) # add number 
-            # check if any bucket is overflowing 
-                # if there is an overflow  ----- > create new bucket, rehash, level up, reset ptr 
-            if self.check(self.policy) == True:  ######3 @@@@~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+             
+            # check for split condition  ----- > create new bucket, rehash, level up, reset ptr 
+            if self.check(self.policy) == True: 
                 self.hash_table[1] = [] # create new bucket 
 
                 copy_of_bucket_0 = copy.deepcopy(self.hash_table[0])
                 bucket_0 = []
                 bucket_1 = []
                 for item in copy_of_bucket_0:
-                    # print(item)
                     if item % 2 == 0:
                         bucket_0.append(item)
                     else:
@@ -224,7 +197,6 @@ class LinearHashing:
                 bucket_0 = []
                 bucket_1 = []
                 for item in copy_of_bucket_being_split:
-                    # print("item in splitting bucket...",item)
                     item_as_bin = bin(item)[2:]
 
                     if len(item_as_bin) <= self.level + 1:
@@ -247,9 +219,7 @@ class LinearHashing:
                 split_occured = True 
                 self.stats.split_count += 1
                 # post split, check if next level now
-                if self.num_buckets == 2**(self.level+1):
-                    #print("incrementing level")
-                    #print(self.num_buckets) 
+                if self.num_buckets == 2**(self.level+1): 
                     self.level += 1
                     self.ptr = 0
 
@@ -259,10 +229,10 @@ class LinearHashing:
     def check(self, bucket_key):
         if self.policy == 0:
             if self.level == 0:
-                if self.isOverflowed_RightNow(0)
+                if self.is_overflowed_right_now(0):
                     return True
             else:
-                if self.isOverflowedRightNow(bucket_key):
+                if self.is_overflowed_right_now(bucket_key):
                     return True 
         
         elif self.policy == 1:
@@ -274,436 +244,10 @@ class LinearHashing:
                 return True
         
         elif self.policy == 3:
-            if self.isOverflowed_RightNow(self.ptr) == True:
+            if self.is_overflowed_right_now(self.ptr) == True:
                 return True
 
         return False           
-
-    ######################################################################### CASE 0 INSERT ##########################################################################
-    def case_0_insert(self, num):
-        split_occured = False
-        #print("in case 0")
-        
-        # for level 0 
-        if self.level == 0:
-            # Insert number 
-            self.hash_table[0].append(num) # add number 
-            # check if any bucket is overflowing 
-                # if there is an overflow  ----- > create new bucket, rehash, level up, reset ptr 
-            if self.isOverflowedRightNow(0) == True:  
-                self.hash_table[1] = [] # create new bucket 
-
-                copy_of_bucket_0 = copy.deepcopy(self.hash_table[0])
-                bucket_0 = []
-                bucket_1 = []
-                for item in copy_of_bucket_0:
-                    # print(item)
-                    if item % 2 == 0:
-                        bucket_0.append(item)
-                    else:
-                        bucket_1.append(item) 
-                self.hash_table[0] = bucket_0
-                self.hash_table[1] = bucket_1 
-                self.level = 1
-                self.ptr = 0 
-                self.num_buckets += 1
-                split_occured = True
-                self.stats.split_count += 1 # update stats object  
- 
-
-        # for other levels
-        else: 
-            #print("else", num)
-            #print("Level is: ", self.level)
-            
-            ############ INSERT NUMBER INTO BUCKET ############
-            num_as_bin = bin(num)[2:]
-            
-            bucket_key = None 
-            if len(num_as_bin) <= self.level:
-                ht_index_try_1 = num
-                if ht_index_try_1 in self.hash_table:
-                    self.hash_table[ht_index_try_1].append(num)
-                    bucket_key = ht_index_try_1
-                else:
-                    print("cant find matching bucket")
-
-            # number as binary is necessarily >= 2 
-            else: 
-                bigger_last_bits = num_as_bin[-1: -(self.level + 2) : -1][::-1]
-                smaller_last_bits = num_as_bin[-1: -(self.level + 1) : -1][::-1]
-                if int(bigger_last_bits, 2) in self.hash_table:
-                    self.hash_table[int(bigger_last_bits,2)].append(num)
-                    bucket_key = int(bigger_last_bits,2)
-                elif int(smaller_last_bits, 2) in self.hash_table:
-                    self.hash_table[int(smaller_last_bits,2)].append(num) 
-                    bucket_key = int(smaller_last_bits,2)
-                else:
-                    print("problem. number is....:", num, bigger_last_bits, smaller_last_bits)
-
-
-            # if there is an overflow  ----- > create new bucket, rehash, move ptr. Check if leveling up, and if so, reset ptr
-            if self.isOverflowedRightNow(bucket_key) == True:
-                # print("spliiting bucket: ", )
-                bin_of_ptr =  bin(self.ptr)[2:]
-                #print("spliting bucket: ", self.ptr)
-                #print("\n")
-                new_bucket_value_0 = self.ptr
-                new_bucket_value_1 = self.ptr + 2**(self.level)
-
-                # rehash 
-                copy_of_bucket_being_split = copy.deepcopy(self.hash_table[self.ptr])
-                bucket_0 = []
-                bucket_1 = []
-                for item in copy_of_bucket_being_split:
-                    # print("item in splitting bucket...",item)
-                    item_as_bin = bin(item)[2:]
-
-                    if len(item_as_bin) <= self.level + 1:
-                        k_bits_as_int = item 
-                    else:
-                        k_bits_as_int = int(item_as_bin[-1: -(self.level + 2) : -1][::-1], 2)
-                    
-                    if k_bits_as_int == new_bucket_value_0:
-                        bucket_0.append(item)
-                    elif k_bits_as_int == new_bucket_value_1:
-                        bucket_1.append(item)
-                    else:
-                        print("problemo. item val is: ", item) 
-
-                self.hash_table[new_bucket_value_0] = bucket_0
-                self.hash_table[new_bucket_value_1] = bucket_1 
-                
-                self.num_buckets += 1
-                self.ptr +=1 
-                split_occured = True 
-                self.stats.split_count += 1
-                # post split, check if next level now
-                if self.num_buckets == 2**(self.level+1):
-                    #print("incrementing level")
-                    #print(self.num_buckets) 
-                    self.level += 1
-                    self.ptr = 0
-
-                
-        return split_occured 
-
-    ##################################################################### CASE 1 INSERT ####################################################
-
-    def case_1_insert(self, num):
-        split_occured = False
-        #print("in case 1")
-        
-        # for level 0 
-        if self.level == 0:
-            # Insert number 
-            self.hash_table[0].append(num) # add number 
-
-            # if the number of overflow buckets is >= max_overflow  ----- > create new bucket, rehash, level up, reset ptr 
-            if self.get_total_number_of_overflow_buckets() >=  self.max_overflow:  
-                self.hash_table[1] = [] # create new bucket 
-
-                copy_of_bucket_0 = copy.deepcopy(self.hash_table[0])
-                bucket_0 = []
-                bucket_1 = []
-                for item in copy_of_bucket_0:
-                    # print(item)
-                    if item % 2 == 0:
-                        bucket_0.append(item)
-                    else:
-                        bucket_1.append(item) 
-
-                self.hash_table[0] = bucket_0
-                self.hash_table[1] = bucket_1 
-
-                self.level = 1
-                self.ptr = 0 
-                self.num_buckets += 1 # dont know abt this 
-                split_occured = True
-                self.stats.split_count += 1 
-
-        # for other levels
-        else: 
-            
-            ############ INSERT NUMBER INTO BUCKET ############
-            num_as_bin = bin(num)[2:]
-            
-            if len(num_as_bin) <= self.level:
-                ht_index_try_1 = num
-                if ht_index_try_1 in self.hash_table:
-                    self.hash_table[ht_index_try_1].append(num)
-                else:
-                    print("cant find matching bucket")
-
-            # number as binary is necessarily >= 2 
-            else: 
-                bigger_last_bits = num_as_bin[-1: -(self.level + 2) : -1][::-1]
-                smaller_last_bits = num_as_bin[-1: -(self.level + 1) : -1][::-1]
-                if int(bigger_last_bits, 2) in self.hash_table:
-                    self.hash_table[int(bigger_last_bits,2)].append(num) 
-                elif int(smaller_last_bits, 2) in self.hash_table:
-                    self.hash_table[int(smaller_last_bits,2)].append(num) 
-                else:
-                    print("problem. number is....:", num, bigger_last_bits, smaller_last_bits)
-
-
-            #print("is overflow?", self.is_an_overflow_rn)
-            # if the number of overflow buckets is >= maxoverflow  ----- > create new bucket, rehash, move ptr. Check if leveling up, and if so, reset ptr
-            if self.get_total_number_of_overflow_buckets() >= self.max_overflow:
-                # print("spliiting bucket: ", )
-                bin_of_ptr =  bin(self.ptr)[2:]
-                #print("splitting bucket: ", self.ptr)
-                #print("\n")
-                new_bucket_value_0 = self.ptr
-                new_bucket_value_1 = self.ptr + 2**(self.level)
-
-                # rehash 
-                copy_of_bucket_being_split = copy.deepcopy(self.hash_table[self.ptr])
-                bucket_0 = []
-                bucket_1 = []
-                for item in copy_of_bucket_being_split:
-                    #print("item in splitting bucket...",item)
-                    item_as_bin = bin(item)[2:]
-
-                    if len(item_as_bin) <= self.level + 1:
-                        k_bits_as_int = item 
-                    else:
-                        k_bits_as_int = int(item_as_bin[-1: -(self.level + 2) : -1][::-1], 2)
-                    
-                    if k_bits_as_int == new_bucket_value_0:
-                        bucket_0.append(item)
-                    elif k_bits_as_int == new_bucket_value_1:
-                        bucket_1.append(item)
-                    else:
-                        print("problemo. item val is: ", item) 
-
-                self.hash_table[new_bucket_value_0] = bucket_0
-                self.hash_table[new_bucket_value_1] = bucket_1 
-                
-                self.num_buckets += 1
-                self.ptr +=1 
-                split_occured = True
-                self.stats.split_count += 1  
-                # post split, check if next level now
-                if self.num_buckets == 2**(self.level+1):
-                    #print("incrementing level")
-                    #print(self.num_buckets) 
-                    self.level += 1
-                    self.ptr = 0
-
-        return split_occured 
-
-######################################################################### CASE 2 ############################################################# 
-
-    def case_2_insert(self, num):
-        split_occured = False
-        #print("in case 2")
-        
-        # for level 0 
-        if self.level == 0:
-            # Insert number 
-            self.hash_table[0].append(num) # add number 
-
-            # if the number of overflow buckets is >= size_limit  ----- > create new bucket, rehash, level up, reset ptr 
-            if self.get_current_capacity_ratio() >=  self.size_limit:  
-                self.hash_table[1] = [] # create new bucket 
-
-                copy_of_bucket_0 = copy.deepcopy(self.hash_table[0])
-                bucket_0 = []
-                bucket_1 = []
-                for item in copy_of_bucket_0:
-                    # print(item)
-                    if item % 2 == 0:
-                        bucket_0.append(item)
-                    else:
-                        bucket_1.append(item) 
-
-                self.hash_table[0] = bucket_0
-                self.hash_table[1] = bucket_1 
-
-                self.level = 1
-                self.ptr = 0 
-                self.num_buckets += 1 # dont know abt this 
-                split_occured = True
-                self.stats.split_count += 1  
-
-        # for other levels
-        else: 
-            
-            ############ INSERT NUMBER INTO BUCKET ############
-            num_as_bin = bin(num)[2:]
-            
-            if len(num_as_bin) <= self.level:
-                ht_index_try_1 = num
-                if ht_index_try_1 in self.hash_table:
-                    self.hash_table[ht_index_try_1].append(num)
-                else:
-                    print("cant find matching bucket")
-
-            # number as binary is necessarily >= 2 
-            else: 
-                bigger_last_bits = num_as_bin[-1: -(self.level + 2) : -1][::-1]
-                smaller_last_bits = num_as_bin[-1: -(self.level + 1) : -1][::-1]
-                if int(bigger_last_bits, 2) in self.hash_table:
-                    self.hash_table[int(bigger_last_bits,2)].append(num) 
-                elif int(smaller_last_bits, 2) in self.hash_table:
-                    self.hash_table[int(smaller_last_bits,2)].append(num) 
-                else:
-                    print("problem. number is....:", num, bigger_last_bits, smaller_last_bits)
-
-            # if the current capacity is >= size_limit  ----- > create new bucket, rehash, move ptr. Check if leveling up, and if so, reset ptr
-            if self.get_current_capacity_ratio() >= self.size_limit:
-                # print("spliiting bucket: ", )
-                bin_of_ptr =  bin(self.ptr)[2:]
-                #print("splitting bucket: ", self.ptr)
-                #print("\n")
-                new_bucket_value_0 = self.ptr
-                new_bucket_value_1 = self.ptr + 2**(self.level)
-
-                # rehash 
-                copy_of_bucket_being_split = copy.deepcopy(self.hash_table[self.ptr])
-                bucket_0 = []
-                bucket_1 = []
-                for item in copy_of_bucket_being_split:
-                    #print("item in splitting bucket...",item)
-                    item_as_bin = bin(item)[2:]
-
-                    if len(item_as_bin) <= self.level + 1:
-                        k_bits_as_int = item 
-                    else:
-                        k_bits_as_int = int(item_as_bin[-1: -(self.level + 2) : -1][::-1], 2)
-                    
-                    if k_bits_as_int == new_bucket_value_0:
-                        bucket_0.append(item)
-                    elif k_bits_as_int == new_bucket_value_1:
-                        bucket_1.append(item)
-                    else:
-                        print("problemo. item val is: ", item) 
-
-                self.hash_table[new_bucket_value_0] = bucket_0
-                self.hash_table[new_bucket_value_1] = bucket_1 
-                
-                self.num_buckets += 1
-                self.ptr +=1 
-                split_occured = True
-                self.stats.split_count += 1  
-                # post split, check if next level now
-                if self.num_buckets == 2**(self.level+1):
-                    #print("incrementing level")
-                    #print(self.num_buckets) 
-                    self.level += 1
-                    self.ptr = 0
-
-        return split_occured 
-
-
-############################################################################### CASE 3 ##############################################################
-
-    def case_3_insert(self, num):
-        split_occured = False
-        #print("in case 3")
-        
-        # for level 0 
-        if self.level == 0:
-            # Insert number 
-            self.hash_table[0].append(num) # add number 
-            # if there is an overflow for bucket that would be split  ----- > create new bucket, rehash, level up, reset ptr 
-            if self.isOverflowedRightNow(self.ptr) == True:  
-                self.hash_table[1] = [] # create new bucket 
-
-                copy_of_bucket_0 = copy.deepcopy(self.hash_table[0])
-                bucket_0 = []
-                bucket_1 = []
-                for item in copy_of_bucket_0:
-                    # print(item)
-                    if item % 2 == 0:
-                        bucket_0.append(item)
-                    else:
-                        bucket_1.append(item) 
-                self.hash_table[0] = bucket_0
-                self.hash_table[1] = bucket_1 
-                self.level = 1
-                self.ptr = 0 
-                self.num_buckets += 1
-                split_occured = True
-                self.stats.split_count += 1  
- 
-
-        # for other levels
-        else: 
-            #print("else", num)
-            #print("Level is: ", self.level)
-            
-            ############ INSERT NUMBER INTO BUCKET ############
-            num_as_bin = bin(num)[2:]
-            
-            bucket_key = None 
-            if len(num_as_bin) <= self.level:
-                ht_index_try_1 = num
-                if ht_index_try_1 in self.hash_table:
-                    self.hash_table[ht_index_try_1].append(num)
-                    bucket_key = ht_index_try_1
-                else:
-                    print("cant find matching bucket")
-
-            # number as binary is necessarily >= 2 
-            else: 
-                bigger_last_bits = num_as_bin[-1: -(self.level + 2) : -1][::-1]
-                smaller_last_bits = num_as_bin[-1: -(self.level + 1) : -1][::-1]
-                if int(bigger_last_bits, 2) in self.hash_table:
-                    self.hash_table[int(bigger_last_bits,2)].append(num)
-                    bucket_key = int(bigger_last_bits,2)
-                elif int(smaller_last_bits, 2) in self.hash_table:
-                    self.hash_table[int(smaller_last_bits,2)].append(num) 
-                    bucket_key = int(smaller_last_bits,2)
-                else:
-                    print("problem. number is....:", num, bigger_last_bits, smaller_last_bits)
-
-            # if there is an overflow for bucket that would be split ----- > create new bucket, rehash, move ptr. Check if leveling up, and if so, reset ptr
-            if self.isOverflowedRightNow(self.ptr) == True:
-                # print("spliiting bucket: ", )
-                bin_of_ptr =  bin(self.ptr)[2:]
-                #print("spliting bucket: ", self.ptr)
-                #print("\n")
-                new_bucket_value_0 = self.ptr
-                new_bucket_value_1 = self.ptr + 2**(self.level)
-
-                # rehash 
-                copy_of_bucket_being_split = copy.deepcopy(self.hash_table[self.ptr])
-                bucket_0 = []
-                bucket_1 = []
-                for item in copy_of_bucket_being_split:
-                    # print("item in splitting bucket...",item)
-                    item_as_bin = bin(item)[2:]
-
-                    if len(item_as_bin) <= self.level + 1:
-                        k_bits_as_int = item 
-                    else:
-                        k_bits_as_int = int(item_as_bin[-1: -(self.level + 2) : -1][::-1], 2)
-                    
-                    if k_bits_as_int == new_bucket_value_0:
-                        bucket_0.append(item)
-                    elif k_bits_as_int == new_bucket_value_1:
-                        bucket_1.append(item)
-                    else:
-                        print("problemo. item val is: ", item) 
-
-                self.hash_table[new_bucket_value_0] = bucket_0
-                self.hash_table[new_bucket_value_1] = bucket_1 
-                
-                self.num_buckets += 1
-                self.ptr +=1 
-                split_occured = True 
-                self.stats.split_count += 1 
-                # post split, check if next level now
-                if self.num_buckets == 2**(self.level+1):
-                    # print("incrementing level")
-                    # print(self.num_buckets) 
-                    self.level += 1
-                    self.ptr = 0
- 
-        return split_occured 
-
 
     ############################################################## Search #################################################################
     def Search(self, num_to_find):
@@ -728,7 +272,6 @@ class LinearHashing:
         
         # level >= 1         
         else:
-            # bucket_key = None 
             if len(num_as_bin) <= self.level:
                 ht_index_try_1 = num_to_find
                 if ht_index_try_1 in self.hash_table:
@@ -863,7 +406,7 @@ class LinearHashing:
 
     ##################################################################### HELPER FUNCTIONS ############################################
 
-    # use for Case 2 
+    # use for determining when to split for policy 2 
     def get_current_capacity_ratio(self):
         # get number of items in the table
         num_items_in_table = 0
@@ -887,7 +430,7 @@ class LinearHashing:
     def get_num_buckets(self):
         return self.num_buckets 
 
-    def isOverflowedRightNow(self, bucket_key):
+    def is_overflowed_right_now(self, bucket_key):
         if bucket_key not in self.hash_table:
             print("error...key not in table. can't check for overflow")
         else:
@@ -1024,63 +567,55 @@ def get_skewed_test_sets():
 
 
 if __name__ == "__main__":
-    # x = LinearHashing(page_size = 2, policy = 0, max_overflow = 2)
-    # x = LinearHashing(page_size = 2, policy = 1, max_overflow = 0)
+    # x = LinearHashing(page_size = 5, policy = 0)
+    # x = LinearHashing(page_size = 3, policy = 1, max_overflow = 5)
     # x = LinearHashing(page_size = 2, policy = 2, size_limit = 0.7)
+    x = LinearHashing(page_size = 3, policy = 3)
 
-    '''
-    x = LinearHashing(page_size = 4, policy = 2, size_limit=0.85)
+    x.general_insert(2)
+    x.general_insert(0)
+    x.general_insert(1) 
+    x.general_insert(5)
+    x.general_insert(23)
+    x.general_insert(42)
+    x.general_insert(55)
+    x.general_insert(10)
 
-    x.Insert(2)
-    x.Insert(0)
-    x.Insert(1) 
-    x.Insert(5)
-    x.Insert(23)
-    x.Insert(42)
-    x.Insert(55)
-    x.Insert(10)
+    x.general_insert(22)
+    x.general_insert(100)
+    x.general_insert(95) 
+    x.general_insert(46)
+    x.general_insert(23)
+    x.general_insert(240)
+    x.general_insert(111)
+    x.general_insert(42)
 
-    x.Insert(999)
-    x.Insert(-13)
-    x.Insert(-55)
-    x.Insert(43) 
-    
-    x.Insert(45)
-    x.Insert(2328356)
-    x.Insert(8) 
-    x.Insert(21)
-    x.Insert(32)
-    x.Insert(2000)
-    x.Insert(0)
-    x.Insert(1) 
-    x.Insert(55)
-    x.Insert(-55) 
 
     x.PrintFile("output2.txt")
-    arr = x.ListBucket(5)
+    arr = x.ListBucket(1)
+    print(arr)
 
     print(x.Search(45))
     print(x.Search(23)) 
     print(x.Search(950))
-    print(x.Search(47))
+    print(x.Search(2))
     print(x.Search(99)) 
-    x.Insert(540)
 
     x.Print()
 
     stats_info = x.GetStats()
-    print("STATS~~~~~~~~~~~~~")
+    print("~~~~~~~~~~STATS~~~~~~~~~~~~~")
 
     print("count", stats_info.Count())
-    print(stats_info.Buckets())
-    print(stats_info.Pages())
-    print(stats_info.OverflowBuckets())
-    print(stats_info.SplitCount())
-    print(stats_info.Access())
-    print(stats_info.AccessInsertOnly())
-    print(stats_info.SpaceUtilization())
+    print("main buckets", stats_info.Buckets())
+    print("number of pages", stats_info.Pages())
+    print("overflow buckets", stats_info.OverflowBuckets())
+    print("number of splits", stats_info.SplitCount())
+    print("access count", stats_info.Access())
+    print("access count during insert only", stats_info.AccessInsertOnly())
+    print("space utilization", stats_info.SpaceUtilization())
 
-
+'''
     ##################################################################### Getting skewed distribution testing data ###########################################
 
     (nums_to_insert, nums_to_search) = get_skewed_test_sets()
@@ -1134,7 +669,4 @@ if __name__ == "__main__":
     
     '''
     
-
-
-
 
