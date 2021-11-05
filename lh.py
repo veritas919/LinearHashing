@@ -95,7 +95,6 @@ class LinearHashing:
     # constructor
     def __init__(self, page_size=None, policy = 0, max_overflow = 0, size_limit = 1.0):
         
-
         # basic error checking 
         if page_size < 0 or None:
             print("invalid page size. exitting.")
