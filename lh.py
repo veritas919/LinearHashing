@@ -119,7 +119,7 @@ class LinearHashing:
         self.num_buckets_overflowing = 0    # dont think I need 
         self.num_buckets = 1 # only keeping track of main buckets rn....NOT overflow. dont think I use this  
 
-        print("SIZELIMIT", self.size_limit)
+        #print("SIZELIMIT", self.size_limit)
 
         self.hash_table = {}
         self.hash_table [0] = []
@@ -127,37 +127,40 @@ class LinearHashing:
         self.stats = LinearHashingStats(hash_table=self.hash_table, page_size=self.page_size) 
 
     def Insert(self, number):
-        # call appropriate insert function. Also increment access by one 
+        # call appropriate insert function. Also increment access by one. told to not include splitting in access or accessInsertOnly stats  
         if self.policy == 0:
-            self.case_0_insert(number)
+            res = self.case_0_insert(number)
             self.stats.access += 1
             self.stats.access_insert_only += 1 
+            return res
         elif self.policy == 1:
-            self.case_1_insert(number)
+            res = self.case_1_insert(number)
             self.stats.access += 1 
-            self.stats.access_insert_only += 1 
+            self.stats.access_insert_only += 1
+            return res 
         elif self.policy == 2:
-            self.case_2_insert(number)
+            res = self.case_2_insert(number)
             self.stats.access += 1 
             self.stats.access_insert_only += 1 
+            return res
         elif self.policy == 3:
-            self.case_3_insert(number)
+            res = self.case_3_insert(number)
             self.stats.access += 1
             self.stats.access_insert_only += 1 
+            return res 
         else:
             print("invalid value for policy.")
 
     ######################################################################### CASE 0 INSERT ##########################################################################
     def case_0_insert(self, num):
         split_occured = False
-        print("in case 0")
+        #print("in case 0")
         
         # for level 0 
         if self.level == 0:
             # Insert number 
             self.hash_table[0].append(num) # add number 
             # check if any bucket is overflowing 
-            #self.isOverflowedRightNow(0) 
                 # if there is an overflow  ----- > create new bucket, rehash, level up, reset ptr 
             if self.isOverflowedRightNow(0) == True:  
                 self.hash_table[1] = [] # create new bucket 
@@ -178,13 +181,12 @@ class LinearHashing:
                 self.num_buckets += 1
                 split_occured = True
                 self.stats.split_count += 1 # update stats object  
-
-                # self.isOverflowedRightNow()   # MUST RECHECK    WORKS FINE WITHOUT @@@@@@@@@@@@ TAKE OUT TEMP 
+ 
 
         # for other levels
         else: 
-            print("else", num)
-            print("Level is: ", self.level)
+            #print("else", num)
+            #print("Level is: ", self.level)
             
             ############ INSERT NUMBER INTO BUCKET ############
             num_as_bin = bin(num)[2:]
@@ -211,15 +213,13 @@ class LinearHashing:
                 else:
                     print("problem. number is....:", num, bigger_last_bits, smaller_last_bits)
 
-            # self.isOverflowedRightNow()
 
-            # print("is overflow?", self.is_an_overflow_rn)
             # if there is an overflow  ----- > create new bucket, rehash, move ptr. Check if leveling up, and if so, reset ptr
             if self.isOverflowedRightNow(bucket_key) == True:
                 # print("spliiting bucket: ", )
                 bin_of_ptr =  bin(self.ptr)[2:]
-                print("spliting bucket: ", self.ptr)
-                print("\n")
+                #print("spliting bucket: ", self.ptr)
+                #print("\n")
                 new_bucket_value_0 = self.ptr
                 new_bucket_value_1 = self.ptr + 2**(self.level)
 
@@ -252,19 +252,19 @@ class LinearHashing:
                 self.stats.split_count += 1
                 # post split, check if next level now
                 if self.num_buckets == 2**(self.level+1):
-                    print("incrementing level")
-                    print(self.num_buckets) 
+                    #print("incrementing level")
+                    #print(self.num_buckets) 
                     self.level += 1
                     self.ptr = 0
 
-                # self.isOverflowedRightNow() # RECHECK...MUST DO        WORKS FINE WITHOUT  @@@@@@@@@@@@@@@@@@@@@@ TAKE OUT 
+                
         return split_occured 
 
     ##################################################################### CASE 1 INSERT ####################################################
 
     def case_1_insert(self, num):
         split_occured = False
-        print("in case 1")
+        #print("in case 1")
         
         # for level 0 
         if self.level == 0:
@@ -296,8 +296,8 @@ class LinearHashing:
 
         # for other levels
         else: 
-            print("else", num)
-            print("Level is: ", self.level)
+            #print("else", num)
+            #print("Level is: ", self.level)
             
             ############ INSERT NUMBER INTO BUCKET ############
             num_as_bin = bin(num)[2:]
@@ -320,15 +320,14 @@ class LinearHashing:
                 else:
                     print("problem. number is....:", num, bigger_last_bits, smaller_last_bits)
 
-            #self.isOverflowedRightNow()
 
             #print("is overflow?", self.is_an_overflow_rn)
             # if the number of overflow buckets is >= maxoverflow  ----- > create new bucket, rehash, move ptr. Check if leveling up, and if so, reset ptr
             if self.get_total_number_of_overflow_buckets() >= self.max_overflow:
                 # print("spliiting bucket: ", )
                 bin_of_ptr =  bin(self.ptr)[2:]
-                print("splitting bucket: ", self.ptr)
-                print("\n")
+                #print("splitting bucket: ", self.ptr)
+                #print("\n")
                 new_bucket_value_0 = self.ptr
                 new_bucket_value_1 = self.ptr + 2**(self.level)
 
@@ -361,8 +360,8 @@ class LinearHashing:
                 self.stats.split_count += 1  
                 # post split, check if next level now
                 if self.num_buckets == 2**(self.level+1):
-                    print("incrementing level")
-                    print(self.num_buckets) 
+                    #print("incrementing level")
+                    #print(self.num_buckets) 
                     self.level += 1
                     self.ptr = 0
 
@@ -372,7 +371,7 @@ class LinearHashing:
 
     def case_2_insert(self, num):
         split_occured = False
-        print("in case 2")
+        #print("in case 2")
         
         # for level 0 
         if self.level == 0:
@@ -404,8 +403,8 @@ class LinearHashing:
 
         # for other levels
         else: 
-            print("else", num)
-            print("Level is: ", self.level)
+            #print("else", num)
+            #print("Level is: ", self.level)
             
             ############ INSERT NUMBER INTO BUCKET ############
             num_as_bin = bin(num)[2:]
@@ -432,8 +431,8 @@ class LinearHashing:
             if self.get_current_capacity_ratio() >= self.size_limit:
                 # print("spliiting bucket: ", )
                 bin_of_ptr =  bin(self.ptr)[2:]
-                print("splitting bucket: ", self.ptr)
-                print("\n")
+                #print("splitting bucket: ", self.ptr)
+                #print("\n")
                 new_bucket_value_0 = self.ptr
                 new_bucket_value_1 = self.ptr + 2**(self.level)
 
@@ -466,8 +465,8 @@ class LinearHashing:
                 self.stats.split_count += 1  
                 # post split, check if next level now
                 if self.num_buckets == 2**(self.level+1):
-                    print("incrementing level")
-                    print(self.num_buckets) 
+                    #print("incrementing level")
+                    #print(self.num_buckets) 
                     self.level += 1
                     self.ptr = 0
 
@@ -478,7 +477,7 @@ class LinearHashing:
 
     def case_3_insert(self, num):
         split_occured = False
-        print("in case 3")
+        #print("in case 3")
         
         # for level 0 
         if self.level == 0:
@@ -504,13 +503,12 @@ class LinearHashing:
                 self.num_buckets += 1
                 split_occured = True
                 self.stats.split_count += 1  
-
-                # self.isOverflowedRightNow()   # MUST RECHECK    WORKS FINE WITHOUT @@@@@@@@@@@@ TAKE OUT TEMP 
+ 
 
         # for other levels
         else: 
-            print("else", num)
-            print("Level is: ", self.level)
+            #print("else", num)
+            #print("Level is: ", self.level)
             
             ############ INSERT NUMBER INTO BUCKET ############
             num_as_bin = bin(num)[2:]
@@ -541,8 +539,8 @@ class LinearHashing:
             if self.isOverflowedRightNow(self.ptr) == True:
                 # print("spliiting bucket: ", )
                 bin_of_ptr =  bin(self.ptr)[2:]
-                print("spliting bucket: ", self.ptr)
-                print("\n")
+                #print("spliting bucket: ", self.ptr)
+                #print("\n")
                 new_bucket_value_0 = self.ptr
                 new_bucket_value_1 = self.ptr + 2**(self.level)
 
@@ -575,8 +573,8 @@ class LinearHashing:
                 self.stats.split_count += 1 
                 # post split, check if next level now
                 if self.num_buckets == 2**(self.level+1):
-                    print("incrementing level")
-                    print(self.num_buckets) 
+                    # print("incrementing level")
+                    # print(self.num_buckets) 
                     self.level += 1
                     self.ptr = 0
  
@@ -784,10 +782,10 @@ class LinearHashing:
             overflow_for_that_key = int(math.ceil(num_items_for_key / self.page_size)) - 1
             num_overflow += overflow_for_that_key 
 
-        print("num overflow: ", num_overflow)
+        #print("num overflow: ", num_overflow)
         return num_overflow 
 
-
+    # my own print method. not to be utilized for assesment. 
     def print_ht(self):
         for key in self.hash_table:
             print("key", key, end = " : ")
@@ -977,31 +975,21 @@ if __name__ == "__main__":
     
     '''
     
-    x = LinearHashing(page_size = 2, policy = 3)
+    x = LinearHashing(page_size = 4, policy = 3)
 
     x.Insert(2)
     x.Insert(0)
     x.Insert(1) 
-    print("bucket #: ", x.get_num_buckets())
     x.Insert(5)
-    print("bucket #: ", x.get_num_buckets())
     x.Insert(23)
-    print("bucket #: ", x.get_num_buckets())
     x.Insert(42)
-    print("bucket #: ", x.get_num_buckets())
     x.Insert(55)
-    print("bucket #: ", x.get_num_buckets())
     x.Insert(10)
-    print("bucket #: ", x.get_num_buckets())
-    x.print_ht()
+
     x.Insert(999)
     x.Insert(-13)
     x.Insert(-55)
-
-    # x.print_ht() 
     x.Insert(43) 
-
-    x.print_ht() 
     
     x.Insert(45)
     x.Insert(2328356)
@@ -1014,15 +1002,9 @@ if __name__ == "__main__":
     x.Insert(55)
     x.Insert(-55) 
 
-
-
-    #x.print_ht()
-    print(" about to print in binary.........")
-    #x.Print() 
     x.PrintFile("output2.txt")
-    #print(x.Count())
     arr = x.ListBucket(5)
-    #print(arr) 
+
 
     print(x.Search(45))
     print(x.Search(23)) 
@@ -1031,11 +1013,10 @@ if __name__ == "__main__":
     print(x.Search(99)) 
     x.Insert(540)
 
-    print()
     x.Print()
 
     stats_info = x.GetStats()
-    print("STATS")
+    print("STATS~~~~~~~~~~~~~")
 
     print("count", stats_info.Count())
     print(stats_info.Buckets())
