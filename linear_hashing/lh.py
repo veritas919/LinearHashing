@@ -1,11 +1,9 @@
-# https://stackoverflow.com/questions/24854965/create-random-numbers-with-left-skewed-probability-distribution
-# referenced  above site for generating skewed dataset 
 import copy 
 import math 
 import random 
-# from scipy.stats import skewnorm          used for generating skewed distribution 
-     
 
+from lh_stats import LinearHashingStats 
+     
 class LinearHashing:
 
     # constructor
@@ -19,6 +17,7 @@ class LinearHashing:
         if policy not in range(0,4):
             print("invalid policy number. exitting.")
             quit() 
+            
         if size_limit < 0 or size_limit > 1:
             print("size_limit should be in [0,1]")    
             quit()    

@@ -1,3 +1,5 @@
+import math 
+
 class LinearHashingStats:
 
     def __init__(self, hash_table, page_size):

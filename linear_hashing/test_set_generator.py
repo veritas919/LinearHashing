@@ -1,3 +1,10 @@
+import math 
+import random 
+from scipy.stats import skewnorm          # used for generating skewed distribution
+
+# https://stackoverflow.com/questions/24854965/create-random-numbers-with-left-skewed-probability-distribution
+# referenced  above site for generating skewed dataset
+
 
 # generate random data sets to use for all tests 
 def get_random_test_sets():
