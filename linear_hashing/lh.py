@@ -4,91 +4,7 @@ import copy
 import math 
 import random 
 # from scipy.stats import skewnorm          used for generating skewed distribution 
-
-
-class LinearHashingStats:
-
-    def __init__(self, hash_table, page_size):
-        self.count = 0
-        self.buckets = 0
-        self.pages = 0
-        self.overflow_buckets = 0
-        self.access = 0
-        self.access_insert_only = 0
-        self.split_count = 0 
-
-        self.hash_table = hash_table
-        self.page_size = page_size 
-
-    # return # of items in hash table
-    def Count(self):
-        # get number of items in the table
-        num_items_in_table = 0
-        for key in self.hash_table:
-            num_items_for_key = len(self.hash_table[key])
-            num_items_in_table += num_items_for_key 
-        return num_items_in_table
-
-    # return # of main buckets ... NOT counting overflow. doesnt matter if bucket is empty or not....it counts  
-    def Buckets(self):
-        num_keys = 0
-        for key in self.hash_table:
-            num_keys += 1
-        return num_keys 
-
-    # returns # of pages in table. If bucket has no numbers in it, it still has 1 page 
-    def Pages(self):
-        # get number of pages in table
-        page_number = 0
-        for key in self.hash_table:
-            num_items_for_key = len(self.hash_table[key])
-            if num_items_for_key == 0: 
-                page_number += 1
-            else:
-                page_number += int(math.ceil(num_items_for_key / self.page_size)) 
-        return page_number 
-
-    def OverflowBuckets(self):
-        num_overflow = 0
-        for key in self.hash_table:
-            num_items_for_key = len(self.hash_table[key])
-            if num_items_for_key == 0:
-                continue
-            overflow_for_that_key = int(math.ceil(num_items_for_key / self.page_size)) - 1
-            num_overflow += overflow_for_that_key 
-
-        # print("num overflow: ", num_overflow)
-        return num_overflow 
-
-    def SplitCount(self):
-        return self.split_count 
-
-    def Access(self):
-        return self.access 
-
-    def AccessInsertOnly(self):
-        return self.access_insert_only
-
-    def SpaceUtilization(self):
-        # get number of items in the table
-        num_items_in_table = 0
-        for key in self.hash_table:
-            num_items_for_key = len(self.hash_table[key])
-            num_items_in_table += num_items_for_key
-        
-        # get number of pages in table
-        page_number = 0
-        for key in self.hash_table:
-            num_items_for_key = len(self.hash_table[key])
-            if num_items_for_key == 0: # if no numbers in key, assume it still has 1 page 
-                page_number += 1
-            else:
-                page_number += int(math.ceil(num_items_for_key / self.page_size)) 
-
-        current_capacity = (num_items_in_table) / (page_number * self.page_size)
-        return current_capacity       
-
-
+     
 
 class LinearHashing:
 
@@ -116,7 +32,7 @@ class LinearHashing:
 
         self.is_an_overflow_rn = False 
         self.num_buckets_overflowing = 0    
-        self.num_buckets = 1 # keeping track of main buckets rn....NOT overflow. used to det to level up   
+        self.num_buckets = 1 # keeping track of main buckets....NOT overflow. used to det to level up   
 
         self.hash_table = {}
         self.hash_table [0] = []
@@ -482,88 +398,6 @@ class LinearHashing:
 
             print("Average Access: ", average_access, file = f)
             print("Average Space Utilization: ", avg_space_utilization, file = f)
-
-#################################################################### Non-class functions used for testing ##################################
-
-# generate random data sets to use for all tests 
-def get_random_test_sets():
-    nums_to_insert = []
-    nums_to_search_for = []
-    # do this test 4 times and find average 
-    for i in range(4):
-        a_list_insert = []
-        a_list_search = []
-        # generate and insert 50 random numbers
-        for i in range(50):
-            random_num = random.randint(0, 100)
-            a_list_insert.append(random_num)
-        
-        # do 20 searches 
-        for i in range(20):
-            random_num_to_find = random.randint(0,100)
-            a_list_search.append(random_num_to_find)
-        
-        nums_to_insert.append(a_list_insert)
-        nums_to_search_for.append(a_list_search)
-
-    return (nums_to_insert, nums_to_search_for)
-
-# generate nearly unifornly distributed test data sets 
-def get_nearly_uniform_test_sets():
-
-    nums_to_insert = []
-    nums_to_search_for = []
-    # do this test 4 times and find average 
-    for i in range(4):
-        a_list_insert = []
-        a_list_search = []
-        same_random_num = random.randint(0, 100)
-        # generate and insert nearly 50 of the same numbers
-        for i in range(50):
-            if i == 7  or i == 25 or i == 32:
-                a_list_insert.append(i)
-            else:
-                a_list_insert.append(same_random_num)
-        
-        # do 20 searches 
-        for i in range(20):
-            random_num_to_find = random.randint(0,100)
-            a_list_search.append(random_num_to_find)
-        
-        nums_to_insert.append(a_list_insert)
-        nums_to_search_for.append(a_list_search)
-
-    return (nums_to_insert, nums_to_search_for)
-
-# generate skewed data sets 
-def get_skewed_test_sets():
-
-    nums_to_insert = []
-    nums_to_search_for = []
-    # do this test 4 times and find average 
-    for i in range(4):
-        a_list_insert = []
-        a_list_search = []
-        
-        # generate skewed data. skewed left 10 
-        data = skewnorm.rvs(a = 10, size = 50, scale = 1)   # uncomment line that imports skewnorm at top if you want to run this 
-        data = data - min(data)
-        data = data / max(data)
-        data = data * 100 # data <= 100 
-        for item in data:
-            a_list_insert.append(math.floor(item))
-        
-        # do 20 searches 
-        for i in range(20):
-            random_num_to_find = random.randint(0,100)
-            a_list_search.append(random_num_to_find)
-        
-        nums_to_insert.append(a_list_insert)
-        nums_to_search_for.append(a_list_search)
-
-    return (nums_to_insert, nums_to_search_for)
-
-
 
 if __name__ == "__main__":
     # x = LinearHashing(page_size = 5, policy = 0)
