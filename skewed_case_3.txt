@@ -1,2 +1,0 @@
-Average Access:  76.25
-Average Space Utilization:  0.8230079440382504
