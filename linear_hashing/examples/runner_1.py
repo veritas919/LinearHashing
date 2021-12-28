@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
     # search hash table for number specified and print the number of pages searched to find the specified number in the hash table 
     # if the specified number is not in the hash table, Search returns -1 * the number of pages searched 
-    print("~~~~~~~~~~Results of Each Search for a Number~~~~~~~~~~")
+    print("~~~~~~~~~~ Results of Each Search for a Number ~~~~~~~~~~")
     print(45, x.Search(45))
     print(23, x.Search(23)) 
     print(950, x.Search(950))
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     print() 
 
     # print the hash table contents to console 
-    print("~~~~~~~~~~Hash Table~~~~~~~~~~")
+    print("~~~~~~~~~~ Hash Table ~~~~~~~~~~")
     x.Print()
     print() 
 
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     stats_info = x.GetStats()
 
     # print stats to console 
-    print("~~~~~~~~~~STATS~~~~~~~~~~~~~")
+    print("~~~~~~~~~~ Stats ~~~~~~~~~~~~~")
     print("count", stats_info.Count())
     print("main buckets", stats_info.Buckets())
     print("number of pages", stats_info.Pages())
