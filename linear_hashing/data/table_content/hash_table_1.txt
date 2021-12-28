@@ -1,0 +1,10 @@
+key 0 binary 00 : 0 100 240 
+
+key 1 binary 01 : 1 5 
+
+key 2 binary 10 : 2 42 10  --  22 46 42 
+
+key 3 binary 11 : 23 55 95  --  23 111 
+
+Level 2
+Ptr 0
