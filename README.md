@@ -18,5 +18,5 @@ Your file path should now look like "whatever_else\linear_hashing\linear_hashing
 Then, run "python -m examples.runner_1" 
 Similarly, you can run "python -m examples.skewed_data_testing" 
 
-You can run any of the 4 modules in the examples folder or even create your own. 
+You can run any of the 4 scripts in the examples folder or even create your own. 
 
