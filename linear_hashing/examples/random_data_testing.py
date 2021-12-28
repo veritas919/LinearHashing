@@ -1,6 +1,7 @@
 from lh import LinearHashing 
 from test_set_generator import get_random_test_sets 
 
+
 if __name__ == "__main__":
     
     (nums_to_insert, nums_to_search) = get_random_test_sets()
