@@ -34,14 +34,19 @@ if __name__ == "__main__":
     x.PrintFile("./data/table_content/hash_table_1.txt")  
 
     # search hash table for number specified and print the number of pages searched to find the specified number in the hash table 
-    print(x.Search(45))
-    print(x.Search(23)) 
-    print(x.Search(950))
-    print(x.Search(2))
-    print(x.Search(99)) 
+    # if the specified number is not in the hash table, Search returns -1 * the number of pages searched 
+    print("~~~~~~~~~~Results of Each Search for a Number~~~~~~~~~~")
+    print(45, x.Search(45))
+    print(23, x.Search(23)) 
+    print(950, x.Search(950))
+    print(2, x.Search(2))
+    print(99, x.Search(99)) 
+    print() 
 
-    # print hash table contents to console 
+    # print the hash table contents to console 
+    print("~~~~~~~~~~Hash Table~~~~~~~~~~")
     x.Print()
+    print() 
 
     # get stats 
     stats_info = x.GetStats()
