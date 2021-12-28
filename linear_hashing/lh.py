@@ -376,7 +376,7 @@ class LinearHashing:
 
 
     def testing(self, fileObj, nums_to_insert, nums_to_search):
-        with open(fileObj, 'w') as f:
+        with open(fileObj, 'w+') as f:
             space_utilization_sum = 0 
             
             # do this test 4 times and find average 
@@ -384,7 +384,7 @@ class LinearHashing:
                 
                 to_insert = nums_to_insert[i]
                 for item in to_insert:
-                    self.Insert(item)
+                    self.general_insert(item)
                 
                 to_search = nums_to_search[i]
                 for item in to_search:
