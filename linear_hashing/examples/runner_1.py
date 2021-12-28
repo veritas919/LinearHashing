@@ -43,10 +43,11 @@ if __name__ == "__main__":
     # print hash table contents to console 
     x.Print()
 
-    # print stats to console 
+    # get stats 
     stats_info = x.GetStats()
-    print("~~~~~~~~~~STATS~~~~~~~~~~~~~")
 
+    # print stats to console 
+    print("~~~~~~~~~~STATS~~~~~~~~~~~~~")
     print("count", stats_info.Count())
     print("main buckets", stats_info.Buckets())
     print("number of pages", stats_info.Pages())
