@@ -6,14 +6,14 @@ Can insert numbers into hash table, search for numbers, print hash table and rel
 
 A few examples of how to use these modules can be found in the linear_hashing/examples folder. 
 
-First, clone the repository and open the cloned repository (linear_hashing).
+First, clone the repository and open the cloned repository (linear-hashing).
 You should then set up (and activate) a virtual environment and install the requirements.
 
 Next, navigate to the linear_hashing package. 
 
 "cd linear_hashing" 
 
-Your file path should now look like "whatever_else\linear_hashing\linear_hashing"
+Your file path should now look like "whatever_else\linear-hashing\linear_hashing"
 
 Then, run "python -m examples.runner_1" 
 
